@@ -1,0 +1,9 @@
+* Operations
+** Token Level Loss
+** Mean Pooling
+** Attention
+** CRF
+** viterbi
+** Conv1D plus max pooling
+** Max Pooling
+
