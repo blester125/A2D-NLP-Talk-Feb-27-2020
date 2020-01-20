@@ -1,9 +1,24 @@
 * Operations
-** Token Level Loss
-** Mean Pooling
-** Attention
-** CRF
-** viterbi
-** Conv1D plus max pooling
-** Max Pooling
-
+** Obviously Masked
+*** Token Level Loss
+*** Mean Pooling
+*** Attention
+** Complex Masking
+*** CRF
+*** viterbi
+** Subtle Masking
+*** Conv1D plus max pooling
+**** Conv1d will add data into the padding region which the max can pick up
+*** Max Pooling after non relu activation
+**** If you have an activation like sigmoid or tanh you are -1, 1 so the max
+     could come from the padding
+** Batching an `if`
+*** Calculate both branches and uses a mask to combine results
+* Batching
+** Vector vs Matrix
+*** Stacking vectors into a matrix
+*** Matrix Matrix the rows of the first don't interact
+*** The folding trick?
+** Padding
+*** Add a special symbol (`<PAD>`) to inputs so that all elements are the
+    same length
