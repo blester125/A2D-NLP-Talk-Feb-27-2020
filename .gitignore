@@ -1,0 +1,10 @@
+**/_minted-slides/*
+*.nav
+*.pdf
+*.snm
+*.toc
+**/__pycache__/*
+*.pyc
+*.aux
+*.log
+*.out

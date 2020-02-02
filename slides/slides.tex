@@ -1,0 +1,64 @@
+\documentclass{beamer}
+
+\usefonttheme[onlymath]{serif}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{minted}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+}
+\usemintedstyle{manni}
+\newminted{python}{fontsize=\footnotesize}
+
+\usetheme{Pittsburgh}
+
+\usepackage{pgfpages}
+\setbeamertemplate{note page}{\pagecolor{yellow!5}\insertnote}
+\setbeameroption{show notes on second screen=right}
+
+\title{Your Neural Network for NLP is probably wrong}
+\subtitle{Why you need to mask more than you think}
+\author{Brian Lester}
+\institute{Interactions}
+\date{February, 27, 2020}
+
+\def\R{\mathbb{R}}
+
+\begin{document}
+
+\frame{\titlepage}
+\begin{section}{Bio}
+
+\begin{frame}
+    \frametitle{Me}
+    \begin{itemize}
+        \item Work on NLP at Interactions
+        \item My specialization is in Deep Learning
+        \item Maintain \href{https://github.com/dpressel/mead-baseline}{Mead-Baseline}
+    \end{itemize}
+    \note{
+        \begin{itemize}
+            \item Why you should listen to me
+            \item We use NLP to ``facilitate customer care interactions'' aka build better chat bots
+            \item We use DL for most models so I have a lot of experience
+            \item I help maintain Mead-Baseline, our open-source Deep Learning modeling software
+            \item I have batched some complex operations
+            \begin{itemize}
+                \item Batched the CRF
+                \item Batched Beam Search
+            \end{itemize}
+            \item I have tracked down a lot of hidden batch instability problems
+            \item I am trying to get more involved with research so if anyone needs help with some idea, especially if
+                the implementation is tricky, hit me up.
+        \end{itemize}
+    }
+\end{frame}
+
+\end{section} % Bio
+
+\end{document}
