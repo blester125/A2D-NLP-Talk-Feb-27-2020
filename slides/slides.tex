@@ -21,8 +21,22 @@
 \setbeamertemplate{note page}{\pagecolor{yellow!5}\insertnote}
 \setbeameroption{show notes on second screen=right}
 
-\title{Your Neural Network for NLP is probably wrong}
-\subtitle{Why you need to mask more than you think}
+\usepackage{tikz}
+\usetikzlibrary{fit}
+\tikzset{%
+  highlight/.style={rectangle,rounded corners,fill=red!15,draw,
+    fill opacity=0.5,thick,inner sep=0pt}
+}
+\newcommand{\tikzmark}[2]{\tikz[overlay,remember picture,
+  baseline=(#1.base)] \node (#1) {#2};}
+%
+\newcommand{\Highlight}[1][submatrix]{%
+    \tikz[overlay,remember picture]{
+    \node[highlight,fit=(left.north west) (right.south east)] (#1) {};}
+}
+
+\title{Your Neural Network for NLP is Probably Wrong}
+\subtitle{Why You Need to Mask More Than You Think}
 \author{Brian Lester}
 \institute{Interactions}
 \date{February, 27, 2020}
@@ -34,31 +48,457 @@
 \frame{\titlepage}
 \begin{section}{Bio}
 
-\begin{frame}
-    \frametitle{Me}
-    \begin{itemize}
-        \item Work on NLP at Interactions
-        \item My specialization is in Deep Learning
-        \item Maintain \href{https://github.com/dpressel/mead-baseline}{Mead-Baseline}
-    \end{itemize}
-    \note{
+    \begin{frame}
+        \frametitle{Me}
         \begin{itemize}
-            \item Why you should listen to me
-            \item We use NLP to ``facilitate customer care interactions'' aka build better chat bots
-            \item We use DL for most models so I have a lot of experience
-            \item I help maintain Mead-Baseline, our open-source Deep Learning modeling software
-            \item I have batched some complex operations
-            \begin{itemize}
-                \item Batched the CRF
-                \item Batched Beam Search
-            \end{itemize}
-            \item I have tracked down a lot of hidden batch instability problems
-            \item I am trying to get more involved with research so if anyone needs help with some idea, especially if
-                the implementation is tricky, hit me up.
+            \item Work on NLP at Interactions
+            \item My specialization is in Deep Learning
+            \item Maintain \href{https://github.com/dpressel/mead-baseline}{Mead-Baseline}
         \end{itemize}
-    }
-\end{frame}
+        \note{
+            \begin{itemize}
+                \item Why you should listen to me
+                \item We use NLP to ``facilitate customer care interactions'' aka build better chat bots
+                \item We use DL for most models so I have a lot of experience
+                \item I help maintain Mead-Baseline, our open-source Deep Learning modeling software
+                \item I have batched some complex operations
+                \begin{itemize}
+                    \item Batched the CRF
+                    \item Batched Beam Search
+                \end{itemize}
+                \item I have tracked down a lot of hidden batch instability problems
+                \item I am trying to get more involved with research so if anyone needs help with some idea, especially if
+                    the implementation is tricky, hit me up.
+            \end{itemize}
+        }
+    \end{frame}
 
 \end{section} % Bio
+
+\begin{section}{Motivation}
+    \begin{subsection}{What is batching?}
+        \begin{frame}
+            \frametitle{Binary Logistic Regression}
+            \begin{align*}
+                n &\coloneqq \text{number of features} \\
+                c &\coloneqq \text{number of class} \coloneqq 1 \\
+                f &\in \R ^ {n} \\
+                w &\in \R ^ {n} \\
+                s &= \sum_{i=0}^{n} f_i * w_i \\
+            \end{align*}
+
+        \end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Binary Logistic Regression}
+    \begin{pythoncode}
+                        s = np.dot(f, w)
+    \end{pythoncode}
+\end{frame}
+
+        \begin{frame}
+            \frametitle{Binary Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    &\tikzmark{left}{1}\tikzmark{right} & 2 & 3 & 4 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                w &= \left[ \begin{array}{*6{c}}
+                    &\tikzmark{left}{5}\tikzmark{right} & 6 & 7 & 8 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= 5
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Binary Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & 1 & \tikzmark{left}{2} \tikzmark{right}{} & 3 & 4 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                w &= \left[ \begin{array}{*6{c}}
+                    & 5 & \tikzmark{left}{6} \tikzmark{right}{} & 7 & 8 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= 17
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Binary Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & 1 & 2 & 3 & 4 &
+                    \end{array}
+                    \right] \\
+                w &= \left[ \begin{array}{*6{c}}
+                    & 5 & 6 & 7 & 8 &
+                    \end{array}
+                    \right] \\
+                s &= 70
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Multi-class Logistic Regression}
+            \begin{align*}
+                n &\coloneqq \text{number of features} \\
+                c &\coloneqq \text{number of class} \\
+                f &\in \R ^ {n} \\
+                W &\in \R ^ {n \text{ x } c} \\
+                s &\in \R ^ {c} \\
+                s_j &= \sum_{i=0}^{n} f_i * W_{ij} \\
+            \end{align*}
+
+        \end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Binary Logistic Regression}
+    \begin{pythoncode}
+                    s = []
+                    for w in W.T:
+                        s.append(np.dot(f, w))
+                    s = np.array(s)
+    \end{pythoncode}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Binary Logistic Regression}
+    \begin{pythoncode}
+                    s = np.dot(f, W)
+    \end{pythoncode}
+\end{frame}
+
+        \begin{frame}
+            \frametitle{Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & \tikzmark{left}{1}\tikzmark{right}{} & 2 & 3 & 4 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{5}\tikzmark{right}{} & 9  & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{5} \tikzmark{right}{} & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & 1 & \tikzmark{left}{2} \tikzmark{right}{} & 3 & 4 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & 9  & \\
+                    & \tikzmark{left}{6}\tikzmark{right}{} & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{17} \tikzmark{right}{} & &
+                    \end{array}
+                    \right] \\
+                \Highlight[thrid]
+            \end{align*}
+        \end{frame}
+
+
+        \begin{frame}
+            \frametitle{Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & \tikzmark{left}{1} & 2 & 3 & \tikzmark{right}{4} &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{5} & 9  & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & \tikzmark{right}{8} & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{70}\tikzmark{right}{} & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & \tikzmark{left}{1}\tikzmark{right}{} & 2 & 3 & 4 &
+                    \end{array}
+                    \right] \\
+                    \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & \tikzmark{left}{9}\tikzmark{right}{}  & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                    \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & \tikzmark{left}{9}\tikzmark{right}{} &
+                    \end{array}
+                    \right] \\
+                    \Highlight[third]
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & 1 & \tikzmark{left}{2}\tikzmark{right}{} & 3 & 4 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & 9 & \\
+                    & 6 & \tikzmark{left}{10}\tikzmark{right}{}  & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & \tikzmark{left}{9}\tikzmark{right}{} &
+                    \end{array}
+                    \right] \\
+                \Highlight[thrid]
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & \tikzmark{left}{1} & 2 & 3 & \tikzmark{right}{4} &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & \tikzmark{left}{9}  & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & \tikzmark{right}{12} &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & \tikzmark{left}{9}\tikzmark{right}{} &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+        \end{frame}
+
+
+        \begin{frame}
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                n &\coloneqq \text{number of features} \\
+                c &\coloneqq \text{number of class} \\
+                b &\coloneqq \text{number of examples} \\
+                F &\in \R ^ {b \text{ x } n} \\
+                W &\in \R ^ {n \text{ x } c} \\
+                S &\in \R ^ {b \text{ x } c} \\
+                S_{kj} &= \sum_{i=0}^{n} F_{ki} * W_{ij} \\
+            \end{align*}
+
+        \end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Batched Multi-class Logistic Regression}
+    \begin{pythoncode}
+                S = []
+                for f in F:
+                    s = []
+                    for w in W.T:
+                        s.append(np.dot(f, w))
+                    S.append(s)
+                S = np.array(S)
+    \end{pythoncode}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Batched Multi-class Logistic Regression}
+    \begin{pythoncode}
+                S = []
+                for f in F:
+                    S.append(np.dot(f, W))
+                S = np.stack(S)
+    \end{pythoncode}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Batched Multi-class Logistic Regression}
+    \begin{pythoncode}
+                S = np.dot(F, W)
+    \end{pythoncode}
+\end{frame}
+
+        \begin{frame}
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & \tikzmark{left}{1}\tikzmark{right}{} & 2 & 3 & 4 & \\
+                    & 13 & 14 & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{5}\tikzmark{right}{} & 9  & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{5} \tikzmark{right}{} & & \\
+                    & & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & \tikzmark{left}{1} & 2 & 3 & \tikzmark{right}{4} & \\
+                    & 13 & 14 & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{5} & 9  & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & \tikzmark{right}{8} & 12 &\\
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{70} \tikzmark{right}{} & & \\
+                    & & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & \tikzmark{left}{1} & 2 & 3 & \tikzmark{right}{4} & \\
+                    & 13 & 14 & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & \tikzmark{left}{9} & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & \tikzmark{right}{12} &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & \tikzmark{left}{110} \tikzmark{right}{} & \\
+                    & & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & 1 & 2 & 3 & 4 & \\
+                    & \tikzmark{left}{13} & 14 & 15 & \tikzmark{right}{16} &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{5} & 9  & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & \tikzmark{right}{8} & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & 110 & \\
+                    & \tikzmark{left}{382}\tikzmark{right}{} & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & 1 & 2 & 3 & 4 & \\
+                    & \tikzmark{left}{13} & 14 & 15 & \tikzmark{right}{16} &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & \tikzmark{left}{9} & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & \tikzmark{right}{12} &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & 110 & \\
+                    & 382 & \tikzmark{left}{614} \tikzmark{right}{}&
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+        \end{frame}
+
+
+    \end{subsection} % What
+
+\end{section} % Motivation
+
 
 \end{document}
