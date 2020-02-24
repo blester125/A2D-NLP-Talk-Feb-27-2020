@@ -42,6 +42,7 @@
 \date{February, 27, 2020}
 
 \def\R{\mathbb{R}}
+\def\N{\mathbb{N}}
 
 \begin{document}
 
@@ -153,13 +154,13 @@
                 f &\in \R ^ {n} \\
                 W &\in \R ^ {n \text{ x } c} \\
                 s &\in \R ^ {c} \\
-                s_j &= \sum_{i=0}^{n} f_i * W_{ij} \\
+                \forall_{j \in c}\hspace{2pt} s_j &= \sum_{i=0}^{n} f_i * W_{ij} \\
             \end{align*}
 
         \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{Binary Logistic Regression}
+    \frametitle{Multi-class Logistic Regression}
     \begin{pythoncode}
                     s = []
                     for w in W.T:
@@ -169,7 +170,7 @@
 \end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{Binary Logistic Regression}
+    \frametitle{Multi-class Logistic Regression}
     \begin{pythoncode}
                     s = np.dot(f, W)
     \end{pythoncode}
@@ -330,7 +331,7 @@
                 F &\in \R ^ {b \text{ x } n} \\
                 W &\in \R ^ {n \text{ x } c} \\
                 S &\in \R ^ {b \text{ x } c} \\
-                S_{kj} &= \sum_{i=0}^{n} F_{ki} * W_{ij} \\
+                \forall_{k \in b} \hspace{2pt} \forall_{j \in c} \hspace{2pt} S_{kj} &= \sum_{i=0}^{n} F_{ki} * W_{ij} \\
             \end{align*}
 
         \end{frame}
@@ -498,7 +499,150 @@
 
     \end{subsection} % What
 
+    \begin{subsection}{Why Batching?}
+
+        \begin{frame}
+            \frametitle{Full Gradient Descent}
+
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Stochastic Gradient Descent}
+
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Mini-Batched Gradient Descent}
+
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Gradient Accumulation?}
+
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Speed}
+
+        \end{frame}
+
+    \end{subsection} % Why
+
 \end{section} % Motivation
 
+% \begin{section}{Batching is hard in NLP}
+
+% \end{section} % Hard in NLP
+
+\begin{section}{Batching can Introduce Errors}
+
+    \begin{subsection}{Mean Pooling}
+        \begin{frame}
+            \frametitle{Mean Pooling}
+            \begin{itemize}
+            \item[]<1->$
+                \left[ \begin{array}{*6{c}}
+                    1 & 10 & 8 & 17 & 13 & 17
+                \end{array} \right] = \frac{66}{6} = 11.0
+            $
+            \item[]
+            \item[]<2->$
+                \left[ \begin{array}{*4{c}}
+                    22 & 24 & 9 & 13
+                \end{array} \right] = \frac{68}{4} = 17.0
+            $
+            \item[]
+            \item[]<3->$
+                \left[ \begin{array}{*6{c}}
+                    5 & 4 & 8 & 9 & 10 & 34 \\
+                    6 & 3 & 1 & 4 & 0 & 0
+                \end{array} \right] =
+                \left[ \begin{array}{c}
+                    \frac{66}{6} \\
+                    \frac{68}{6}
+                \end{array} \right] =
+                \left[ \begin{array}{c}
+                    11.0 \\
+                    11.\bar{3}
+                \end{array} \right]
+            $
+            \end{itemize}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Mean Pooling}
+
+        \end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Mean Pooling}
+
+    \begin{pythoncode}
+            >>> x
+            array([[ 1, 10,  8, 17, 13, 17],
+                   [22, 24,  9, 13,  0,  0]])
+            >>> np.mean(x, axis=1)
+            array([11.        , 11.33333333])
+            >>> lengths
+            array([6, 4])
+            >>> np.sum(x, axis=1) / lengths
+            array([11., 17.])
+    \end{pythoncode}
+
+\end{frame}
+
+    \end{subsection} % Mean Pooling
+
+    \begin{subsection}{Token Level Losses}
+
+        \begin{frame}
+            \frametitle{Cross Entropy Loss}
+            \begin{align*}
+                T &\coloneqq \text{length of example} \\
+                V &\coloneqq \text{number of possible labels} \\
+                s &\in \R^{T \text{ x } V} \\
+                l &\in \N^T \\
+                J &= - \sum_{i}^{T} s_i[l_i] \\
+            \end{align*}
+
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Cross Entropy Loss}
+            \begin{align*}
+                s &= \left[ \begin{array}{*5{c}}
+                    -0.34 & 0.1 & -0.11 & \cdots & 0.001 \\
+                    0.93 & -8.88 & -0.39 & \cdots & 0.12 \\
+                    & & \vdots & & \\
+                    -0.45 & 0.23 & 1.1 & \cdots & -0.3
+                \end{array} \right] \\
+                l &= \left[ \begin{array}{*5{c}}
+                    2 & 1 & 10 & 5 & 1
+                \end{array} \right]
+            \end{align*}
+        \end{frame}
+    \end{subsection} % Token Level Losses
+
+    % \begin{subsection}{Attention}
+
+    % \end{subsection} % Attention
+
+    % \begin{subsection}{Conditional Random Field}
+
+    % \end{subsection} % CRF
+
+    % \begin{subsection}{Beam Search}
+
+    % \end{subsection} % Beam Search
+
+    % \begin{subsection}{Convolution 1D}
+
+    % \end{subsection} % Convolution
+
+    % \begin{subsection}{Max Pooling}
+
+    % \end{subsection}
+
+\end{section}
 
 \end{document}
