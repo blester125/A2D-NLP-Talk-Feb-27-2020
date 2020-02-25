@@ -87,7 +87,19 @@
                 w &\in \R ^ {n} \\
                 s &= \sum_{i=0}^{n} f_i * w_i \\
             \end{align*}
-
+        \note{
+            \begin{itemize}
+                \item First we are going to show some examples of how batching works starting with Binary LR
+                \item In binary LR we have a vector representing features and a vector of the same size representing
+                    weights
+                \item (Normally in NLP we have sparse features where we don't have a actual vector of features and use
+                    something like a hashmap instead but inside a neural network everything is dense so we will use
+                    dense here)
+                \item We take the sum of the features weighted by the weights. This is our logit
+                \item Normally we then us a function like sigmoid to create a final probability but we don't need to
+                    worry about that for now.
+            \end{itemize}
+        }
         \end{frame}
 
 \begin{frame}[fragile]
@@ -95,6 +107,12 @@
     \begin{pythoncode}
                         s = np.dot(f, w)
     \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item We are representing our feature and weights as numpy vectors
+            \item we can use the dot product which is the sum of the products of elements in the vectors
+        \end{itemize}
+    }
 \end{frame}
 
         \begin{frame}
@@ -112,6 +130,12 @@
                 \Highlight[second]
                 s &= 5
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see the mechanics of what is happening in our dot product
+                    \item We multiply these terms together and add the result into the s
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
@@ -129,21 +153,35 @@
                 \Highlight[second]
                 s &= 17
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see the mechanics of what is happening in our dot product
+                    \item We multiply these terms together and add the result into the s
+                    \item And it continues on like this.
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
             \frametitle{Binary Logistic Regression}
             \begin{align*}
                 f &= \left[ \begin{array}{*6{c}}
-                    & 1 & 2 & 3 & 4 &
+                    & \tikzmark{left}{1} & 2 & 3 & \tikzmark{right}{4} &
                     \end{array}
                     \right] \\
+                \Highlight[first]
                 w &= \left[ \begin{array}{*6{c}}
-                    & 5 & 6 & 7 & 8 &
+                    & \tikzmark{left}{5} & 6 & 7 & \tikzmark{right}{8} &
                     \end{array}
                     \right] \\
+                \Highlight[second]
                 s &= 70
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we highlight the elements in these arrays that interact with each other.
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
@@ -156,6 +194,20 @@
                 s &\in \R ^ {c} \\
                 \forall_{j \in c}\hspace{2pt} s_j &= \sum_{i=0}^{n} f_i * W_{ij} \\
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item We now extend to multi class where instead of deciding between 2 class (0 and 1) we will
+                        decide between several.
+                    \item We still have a feature vector
+                    \item We now have multiple weight vectors one for each class
+                    \item We pack our weight vectors into a single matrix of size n by c
+                    \item Now our logits are a vector, we have a score for each class
+                    \item for each class we do this same dot product between the feature vector and one of the weight
+                        vectors
+                    \item Once we have the score we normally turn it into probabilities with the softmax function but we
+                        can skip this for now.
+                \end{itemize}
+            }
 
         \end{frame}
 
@@ -167,6 +219,12 @@
                         s.append(np.dot(f, w))
                     s = np.array(s)
     \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item Here we see code that calculates it exactly how I described it before where we explicitly do the dot
+                between the feature and each weight vector in turn
+        \end{itemize}
+    }
 \end{frame}
 
 \begin{frame}[fragile]
@@ -174,6 +232,11 @@
     \begin{pythoncode}
                     s = np.dot(f, W)
     \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item We can actually do this in a single dot product! Lets see why
+        \end{itemize}
+    }
 \end{frame}
 
         \begin{frame}
@@ -198,6 +261,13 @@
                     \right] \\
                 \Highlight[third]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we can see our feature vector and see our new weight metric
+                    \item We how the weight matrix is two weight vectors next to each other
+                    \item Here we see the elements of the feature vector and weight matrix are combined
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
@@ -222,6 +292,14 @@
                     \right] \\
                 \Highlight[thrid]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we can see our feature vector and see our new weight metric
+                    \item We how the weight matrix is two weight vectors next to each other
+                    \item Here we see the elements of the feature vector and weight matrix are combined
+                    \item And it goes on like this...
+                \end{itemize}
+            }
         \end{frame}
 
 
@@ -247,6 +325,16 @@
                     \right] \\
                 \Highlight[third]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we can see our feature vector and see our new weight metric
+                    \item We how the weight matrix is two weight vectors next to each other
+                    \item Here we see the elements of the feature vector and weight matrix are combined
+                    \item And it goes on like this...
+                    \item We see here that the value in this first spot of the logits was calculated between the feature
+                        vector and the first column in the weight matrix
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
@@ -271,6 +359,13 @@
                     \right] \\
                     \Highlight[third]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we can see our feature vector and see our new weight metric
+                    \item We how the weight matrix is two weight vectors next to each other
+                    \item Here we see the elements of the feature vector and the second column weight matrix are combined
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
@@ -295,6 +390,14 @@
                     \right] \\
                 \Highlight[thrid]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we can see our feature vector and see our new weight metric
+                    \item We how the weight matrix is two weight vectors next to each other
+                    \item Here we see the elements of the feature vector and the second column weight matrix are combined
+                    \item And it goes on like this...
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
@@ -319,8 +422,19 @@
                     \right] \\
                 \Highlight[third]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we can see our feature vector and see our new weight metric
+                    \item We how the weight matrix is two weight vectors next to each other
+                    \item Here we see the elements of the feature vector and the second column weight matrix are combined
+                    \item And it goes on like this...
+                    \item We see here that the value in the second spot of the logits was calculated between the feature
+                        vector and the second column in the weight matrix
+                    \item So we can see here that we can calculate the logits for multiple classes at once between there
+                        is no interaction between the columns of the matrix in vector-matrix multiplication.
+                \end{itemize}
+            }
         \end{frame}
-
 
         \begin{frame}
             \frametitle{Batched Multi-class Logistic Regression}
@@ -333,21 +447,20 @@
                 S &\in \R ^ {b \text{ x } c} \\
                 \forall_{k \in b} \hspace{2pt} \forall_{j \in c} \hspace{2pt} S_{kj} &= \sum_{i=0}^{n} F_{ki} * W_{ij} \\
             \end{align*}
-
+            \note{
+                \begin{itemize}
+                    \item We just saw how you can calculate the scores for multiple classes of a single example in a
+                        single vector-matrix multiply. Now we will see how you can actually do this for multiple
+                        examples at once.
+                    \item Here we see Batched Logistic Regression
+                    \item Like before we still have a weight matrix of n by c
+                    \item Now we have stacked multiple feature vectors into a feature matrix with b rows where each row
+                        represents a different feature vector.
+                    \item Now our scores are a matrix were each row is the scores for an example and each column is the
+                        score for some class
+                \end{itemize}
+            }
         \end{frame}
-
-\begin{frame}[fragile]
-    \frametitle{Batched Multi-class Logistic Regression}
-    \begin{pythoncode}
-                S = []
-                for f in F:
-                    s = []
-                    for w in W.T:
-                        s.append(np.dot(f, w))
-                    S.append(s)
-                S = np.array(S)
-    \end{pythoncode}
-\end{frame}
 
 \begin{frame}[fragile]
     \frametitle{Batched Multi-class Logistic Regression}
@@ -357,6 +470,12 @@
                     S.append(np.dot(f, W))
                 S = np.stack(S)
     \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item Here we see a straight forward way to do this, where we loop over the features and calculate the
+                scores for each example separately.
+        \end{itemize}
+    }
 \end{frame}
 
 \begin{frame}[fragile]
@@ -364,12 +483,18 @@
     \begin{pythoncode}
                 S = np.dot(F, W)
     \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item But we can actually do one better, we can calculate the whole thing, all classes for all examples in a
+                single shot!
+        \end{itemize}
+    }
 \end{frame}
 
         \begin{frame}
             \frametitle{Batched Multi-class Logistic Regression}
             \begin{align*}
-                f &= \left[ \begin{array}{*6{c}}
+                F &= \left[ \begin{array}{*6{c}}
                     & \tikzmark{left}{1}\tikzmark{right}{} & 2 & 3 & 4 & \\
                     & 13 & 14 & 15 & 16 &
                     \end{array}
@@ -390,12 +515,21 @@
                     \right] \\
                 \Highlight[third]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see our new feature matrix is two feature vectors stacked on top of each other
+                    \item Our weight matrix is still a n by c matrix of weight vectors standing next to each other
+                    \item We are now doing matrix matrix multiplication
+                    \item Here we see the values for the first class of the first example are using the values in the first
+                        row of the feature vector and the first column of the weight matrix
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
             \frametitle{Batched Multi-class Logistic Regression}
             \begin{align*}
-                f &= \left[ \begin{array}{*6{c}}
+                F &= \left[ \begin{array}{*6{c}}
                     & \tikzmark{left}{1} & 2 & 3 & \tikzmark{right}{4} & \\
                     & 13 & 14 & 15 & 16 &
                     \end{array}
@@ -416,12 +550,18 @@
                     \right] \\
                 \Highlight[third]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see that the first example first class was only calculated by looking at the first row
+                        and first column, nothing else was used.
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
             \frametitle{Batched Multi-class Logistic Regression}
             \begin{align*}
-                f &= \left[ \begin{array}{*6{c}}
+                F &= \left[ \begin{array}{*6{c}}
                     & \tikzmark{left}{1} & 2 & 3 & \tikzmark{right}{4} & \\
                     & 13 & 14 & 15 & 16 &
                     \end{array}
@@ -442,12 +582,18 @@
                     \right] \\
                 \Highlight[third]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item and now we can see here that the first example, second class is only using the first row of
+                        the feature matrix and the last column of the weight matrix
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
             \frametitle{Batched Multi-class Logistic Regression}
             \begin{align*}
-                f &= \left[ \begin{array}{*6{c}}
+                F &= \left[ \begin{array}{*6{c}}
                     & 1 & 2 & 3 & 4 & \\
                     & \tikzmark{left}{13} & 14 & 15 & \tikzmark{right}{16} &
                     \end{array}
@@ -468,12 +614,18 @@
                     \right] \\
                 \Highlight[third]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Similar to above the second example first class uses the second row of the features and the
+                        first column of the weights
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
             \frametitle{Batched Multi-class Logistic Regression}
             \begin{align*}
-                f &= \left[ \begin{array}{*6{c}}
+                F &= \left[ \begin{array}{*6{c}}
                     & 1 & 2 & 3 & 4 & \\
                     & \tikzmark{left}{13} & 14 & 15 & \tikzmark{right}{16} &
                     \end{array}
@@ -494,6 +646,18 @@
                     \right] \\
                 \Highlight[third]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item And finally the last elements uses the two unused rows and columns.
+                    \item So here we have seen that we can stack independent examples together just like we could stack
+                        together independent weight vectors to calculate the scores for multiple examples at once.
+                    \item This works because the rows and columns in matrix-matrix multiplication all act independently
+                        of each other.
+                    \item Totally unrelated data an be next to each other and they won't interact as it flows through
+                        your network
+                    \item Running multiple examples is what we mean by batching.
+                \end{itemize}
+            }
         \end{frame}
 
 
@@ -504,35 +668,176 @@
         \begin{frame}
             \frametitle{Full Gradient Descent}
 
+            \begin{columns}
+                \begin{column}{0.5\textwidth}
+
+                \end{column}
+                \begin{column}{0.5\textwidth}
+                    Pros:
+                    \begin{itemize}
+                        \item This is the True gradient
+                        \item You step is guaranteed to yield better performance on all examples
+                    \end{itemize}
+                    Cons:
+                    \begin{itemize}
+                        \item It is slow
+                        \item You need to run each example before you update any parameters
+                    \end{itemize}
+                \end{column}
+            \end{columns}
+
+            \note{
+                \begin{itemize}
+                    \item The way we train these models is with something called gradient descent
+                    \item This basically means run an example through, calculate how wrong the predicted answer is (the
+                        loss), and use the gradient (the derivative) of the parameters with respect to this loss to
+                        calculate how to update the parameters.
+                    \item In some cases people do full gradient descent where they calculate the answers for each
+                        example and get the gradient for everything
+                    \item this is good because this is the true gradient, this is the best step you can take to do
+                        better next time
+                    \item This is slow because you have to weight to run the network on all your data before you update
+                        any parameters
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
             \frametitle{Stochastic Gradient Descent}
+            \begin{columns}
+                \begin{column}{0.5\textwidth}
+                    Pros:
+                    \begin{itemize}
+                        \item You get to update your parameters each step.
+                        \item You can get better generalization because to the randomness.
+                    \end{itemize}
+                    Cons:
+                    \begin{itemize}
+                        \item Your gradient could be wrong.
+                        \item The gradient for one example can cause a change that is detrimental to another example.
+                    \end{itemize}
+                \end{column}
+                \begin{column}{0.5\textwidth}
+
+                \end{column}
+            \end{columns}
+            \note{
+                \begin{itemize}
+                    \item On the opposite end of the spectrum we have stochastic gradient descent
+                    \item We calculate a gradient and update parameters after each example
+                    \item Talk about pros and cons
+                \end{itemize}
+            }
 
         \end{frame}
 
         \begin{frame}
             \frametitle{Mini-Batched Gradient Descent}
-
+            \begin{columns}
+                \begin{column}{0.5\textwidth}
+                    Pros:
+                    \begin{itemize}
+                        \item You get to update your parameters more often.
+                        \item You can a better approximation of your gradient.
+                    \end{itemize}
+                \end{column}
+                \begin{column}{0.5\textwidth}
+                    Cons:
+                    \begin{itemize}
+                        \item Your need to run the examples in a batch which can be tricky.
+                        \item Minibatch size is now a hyperparameter.
+                    \end{itemize}
+                \end{column}
+            \end{columns}
+            \note{
+                \begin{itemize}
+                    \item This is a happy middle ground between the two
+                    \item We calculate the gradient for a small batch of examples and update
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
             \frametitle{Gradient Accumulation?}
-
+            \begin{itemize}
+                \item We want to have batches for training dynamics
+                \item Why do I actually have to batch?
+                \item Can't I just run each example individually and accumulate the gradients in memory and apply them
+                    when I get enough?
+            \end{itemize}
+            \note{
+                \begin{itemize}
+                    \item Gradient Accumulation is used when your networks are really large and can't fit on a single
+                        GPU
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
             \frametitle{Speed}
-
+                Picture of a GPU
+            \note{
+                \begin{itemize}
+                    \item We showed before that we can express batched operations as matrix matrix multiplcations
+                    \item Lucky for use we are really go at doing these matmuls fast
+                    \item libraries and devices like GPUs are designed to do these is a parallel and fast way
+                    \item we can stand on the shoulders of gaming to train models really fast
+                \end{itemize}
+            }
         \end{frame}
 
     \end{subsection} % Why
 
 \end{section} % Motivation
 
-% \begin{section}{Batching is hard in NLP}
+\begin{section}{Batching is hard in NLP}
 
-% \end{section} % Hard in NLP
+    \begin{frame}
+        \frametitle{Batching in NLP}
+
+
+        \note{
+            \begin{itemize}
+                \item We saw before that batching involves stacking multiple vectors of the same shape into a matrix
+                \item In NLP we often have examples that have different lengths
+                \begin{itemize}
+                    \item Because sentences have different lengths
+                    \item Because words have different number of characters in them
+                \end{itemize}
+                \item we can't just batch any given sentences
+            \end{itemize}
+        }
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Introducing \textless PAD\textgreater}
+
+        \note{
+            \begin{itemize}
+                \item We use a new symbol call \textless PAD\textgreater .
+                \item We add this to the end of shorter sentence so that all the ones in a batch have the sample length.
+                \item Now that they are all the same length we can turn them into a matrix.
+            \end{itemize}
+        }
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{The lengths vector}
+
+        \note{
+            \begin{itemize}
+                \item Now that some of our examples are longer because if this $<PAD>$ we need to track how long the
+                    actual data is
+                \item We store this in a vector
+                \item This will be a vector of the same length as items in the batch
+                \item The value will be the number of non padded elements in that example
+                \item You can actually have padding on every example so the length of your time dimension is longer that
+                    the maximum value in the lengths vector but this is sloppy and we won't really consider that case.
+            \end{itemize}
+        }
+    \end{frame}
+
+\end{section} % Hard in NLP
 
 \begin{section}{Batching can Introduce Errors}
 
@@ -567,11 +872,23 @@
                 \end{array} \right]
             $
             \end{itemize}
-        \end{frame}
-
-        \begin{frame}
-            \frametitle{Mean Pooling}
-
+            \note{
+                \begin{itemize}
+                    \item How we will look at how padding can get us in trouble
+                    \item In most of these examples there is actually another dimension of features but we are going to
+                        ignore it for simplicity
+                    \item This is mean pooling can be used to aggregate over some dimension, for example we can pool the
+                        features across a sentence to get the representation for the whole sentence.
+                    \item Here we see the mean pooling for a vector of length 6
+                    \item<2-> Here we see the mean pooling for a length of 4 (shorter)
+                    \item<3-> How we see that in order to batch we need to pad the shorter vector
+                    \item<3-> No our denominator is much larger so our results is smaller!
+                    \item<3-> Before I said that batching allows us to combine unrelated examples and calculate them in
+                        one short but this illustrates the problems with padding,
+                    \item<3-> When you padding goes wrong your results for some example will bleed over and effect
+                        others which breaks the independence assumption we had before
+                \end{itemize}
+            }
         \end{frame}
 
 \begin{frame}[fragile]
@@ -589,6 +906,20 @@
             array([11., 17.])
     \end{pythoncode}
 
+    \note{
+        \begin{itemize}
+            \item We can solve this by explicitly using the lengths vector we had before.
+            \item We can manually do our sum and then divide by the actual length instead of the length of the padded
+                vector
+            \item This assumes that the padded value is zero. Soon we will see how to insure that.
+            \item This sort of thing is important because if you don't do it then values will dependent on what else is
+                in the batch.
+            \item This problem is especially important in training vs production environments, when training it is
+                almost always in a batch with things that are longer but in prod you are often a single example where
+                you are the longest thing.
+        \end{itemize}
+    }
+
 \end{frame}
 
     \end{subsection} % Mean Pooling
@@ -596,7 +927,7 @@
     \begin{subsection}{Token Level Losses}
 
         \begin{frame}
-            \frametitle{Cross Entropy Loss}
+            \frametitle{(Sparse) Cross Entropy Loss}
             \begin{align*}
                 T &\coloneqq \text{length of example} \\
                 V &\coloneqq \text{number of possible labels} \\
@@ -605,10 +936,23 @@
                 J &= - \sum_{i}^{T} s_i[l_i] \\
             \end{align*}
 
+            \note{
+                \begin{itemize}
+                    \item The next example is in the idea of a token level loss. This is a loss where a loss is computed
+                        at each step in a vector.
+                    \item Here we see the cross entropy loss where we have a matrix of scores. Each row represents the
+                        scores of a token and each column is the score for some tag
+                    \item This is sparse cross entropy where each token only has one label so we can select out the
+                        score for the right class instead of scaling the score with the value on the label
+                    \item Our loss is then the score sum of the score for each token,
+                    \item This kind of loss is often used for language modeling where the label is the index of the next
+                        word or else sequence tagging where the label is the label tag.
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
-            \frametitle{Cross Entropy Loss}
+            \frametitle{(Sparse) Cross Entropy Loss}
             \begin{align*}
                 s &= \left[ \begin{array}{*5{c}}
                     -0.34 & 0.1 & -0.11 & \cdots & 0.001 \\
@@ -618,14 +962,126 @@
                 \end{array} \right] \\
                 l &= \left[ \begin{array}{*5{c}}
                     2 & 1 & 10 & 5 & 1
+                \end{array} \right] \\
+                J &= \left[ \begin{array}{*5{c}}
+                    -0.11 & -8.88 & 0.28 & 0.43 & 0.23
                 \end{array} \right]
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see some examples of score, labels, and the selected scores.
+                \end{itemize}
+            }
         \end{frame}
+
+        \begin{frame}
+            \frametitle{(Sparse) Cross Entropy Loss}
+            \begin{align*}
+                s &= \left[ \begin{array}{*5{c}}
+                    -0.34 & 0.1 & -0.11 & \cdots & 0.001 \\
+                    0.93 & -8.88 & -0.39 & \cdots & 0.12 \\
+                    & & \vdots & & \\
+                    -0.45 & 0.23 & 1.1 & \cdots & -0.3
+                \end{array} \right] \\
+                l &= \left[ \begin{array}{*5{c}}
+                    2 & 1 & 10 & 5 & 1 \\
+                    5 & 6 & 3 & &
+                \end{array} \right] \\
+                J &= \left[ \begin{array}{*5{c}}
+                    -0.11 & -8.88 & 0.28 & 0.43 & 0.23 \\
+                    -3.4 & 0.6 & 0.37 & -956.0 & 10000.0
+                \end{array} \right]
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see what can happen when you are batching the shorter sentence. When you are
+                        selecting the scores for the padding tokens they really could be anything
+                    \item We don't really want the network to have to learn to output a padding symbol after the normal
+                        length, that isn't a situation you would really have
+                    \item We also don't want random lucky values to make our loss really small
+                    \item We need a way to zero our the effects of these padded locations
+                \end{itemize}
+            }
+        \end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Making a Mask}
+    \begin{pythoncode}
+        >>> lengths = np.array([5, 3, 4])
+        >>> steps = np.arange(np.max(lengths))
+        >>> steps
+        array([0, 1, 2, 3, 4])
+        >>> mask = (np.reshape(lengths, (-1, 1)) > steps).astype(np.int32)
+        >>> mask
+        array([[1, 1, 1, 1, 1],
+               [1, 1, 0, 0, 0],
+               [1, 1, 1, 1, 0]], dtype=int32)
+    \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item Here we see how to create a mask. This mask has ones where the valid tokens are and a zero where the
+                padding tokens are.
+            \item We create this with broadcasting.
+            \item We create a vector of incrementing steps along the sentence dimension and compare them to the lengths.
+            \item When the length is longer than the current steps we are still valid so the value is one.
+        \end{itemize}
+    }
+\end{frame}
+
+        \begin{frame}
+            \frametitle{(Sparse) Cross Entropy Loss}
+            \begin{align*}
+                J &= \left[ \begin{array}{*5{c}}
+                    -0.11 & -8.88 & 0.28 & 0.43 & 0.23 \\
+                    -3.4 & 0.6 & 0.37 & -956.0 & 10000.0
+                \end{array} \right]\\
+                \text{mask} &= \left[ \begin{array}{*5{c}}
+                    1 & 1 & 1 & 1 & 1 \\
+                    1 & 1 & 1 & 0 & 0
+                \end{array} \right] \\
+                J * \text{mask} &= \left[ \begin{array}{*5{c}}
+                    -0.11 & -8.88 & 0.28 & 0.43 & 0.23 \\
+                    -3.4 & 0.6 & 0.37 & 0 & 0
+                \end{array} \right]\\
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we can use our mask to force the padding locations to zero.
+                    \item We can then sum the values (or mean them with the lengths if you want).
+                    \item Some toolkits like Pytorch can handle this for you, you give a value to the
+                        \texttt{padding\_idx} parameter and it will ignore values where the label is that padding index
+                \end{itemize}
+            }
+        \end{frame}
+
     \end{subsection} % Token Level Losses
 
-    % \begin{subsection}{Attention}
+    \begin{subsection}{Attention}
 
-    % \end{subsection} % Attention
+        \begin{frame}
+            \frametitle{Attention}
+
+            \note{
+                \begin{itemize}
+                    \item Attention is used to contextualize a vector relative to others.
+                    \item First we calculate a score between the vectors
+                    \item Then we use the softmax so they sum to one and we can do a weighted average
+                    \item Then we do a weighted average of the vectors based on these calculated scores
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Attention}
+
+            \note{
+                \begin{itemize}
+                    \item When you are cal
+                \end{itemize}
+            }
+        \end{frame}
+
+    \end{subsection} % Attention
 
     % \begin{subsection}{Conditional Random Field}
 
