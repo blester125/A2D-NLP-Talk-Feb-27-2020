@@ -1,3 +1,7 @@
+* General idea of batching
+** For feedforward
+** Include reduction along axis
+* Introduce the operations?
 * Operations
 ** Obviously Masked
 *** Token Level Loss
