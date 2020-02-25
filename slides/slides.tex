@@ -43,6 +43,8 @@
 
 \def\R{\mathbb{R}}
 \def\N{\mathbb{N}}
+\newcommand{\softmax}{\mathop{\rm softmax}\nolimits}
+\newcommand{\similar}{\mathop{\rm sim}\nolimits}
 
 \begin{document}
 
@@ -530,6 +532,41 @@
             \frametitle{Batched Multi-class Logistic Regression}
             \begin{align*}
                 F &= \left[ \begin{array}{*6{c}}
+                    & 1 & \tikzmark{left}{2}\tikzmark{right}{} & 3 & 4 & \\
+                    & 13 & 14 & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & 9 \\
+                    & \tikzmark{left}{6}\tikzmark{right}{} & 10  & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{5} \tikzmark{right}{} & & \\
+                    & & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see our new feature matrix is two feature vectors stacked on top of each other
+                    \item Our weight matrix is still a n by c matrix of weight vectors standing next to each other
+                    \item We are now doing matrix matrix multiplication
+                    \item Here we see the values for the first class of the first example are using the values in the first
+                        row of the feature vector and the first column of the weight matrix
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                F &= \left[ \begin{array}{*6{c}}
                     & \tikzmark{left}{1} & 2 & 3 & \tikzmark{right}{4} & \\
                     & 13 & 14 & 15 & 16 &
                     \end{array}
@@ -556,6 +593,14 @@
                         and first column, nothing else was used.
                 \end{itemize}
             }
+        \end{frame}
+
+        \begin{frame}
+            Put two slides of the first row and second column here
+        \end{frame}
+
+        \begin{frame}
+            Put two slides of the first row and second column here
         \end{frame}
 
         \begin{frame}
@@ -591,6 +636,14 @@
         \end{frame}
 
         \begin{frame}
+            Put two slides of the second row and first column here
+        \end{frame}
+
+        \begin{frame}
+            Put two slides of the second row and first column here
+        \end{frame}
+
+        \begin{frame}
             \frametitle{Batched Multi-class Logistic Regression}
             \begin{align*}
                 F &= \left[ \begin{array}{*6{c}}
@@ -620,6 +673,14 @@
                         first column of the weights
                 \end{itemize}
             }
+        \end{frame}
+
+        \begin{frame}
+            Put two slides of the second row and second column here
+        \end{frame}
+
+        \begin{frame}
+            Put two slides of the second row and second column here
         \end{frame}
 
         \begin{frame}
@@ -670,7 +731,7 @@
 
             \begin{columns}
                 \begin{column}{0.5\textwidth}
-
+                    Picture representing Full GD Here, maybe a long and strong arrow?
                 \end{column}
                 \begin{column}{0.5\textwidth}
                     Pros:
@@ -718,7 +779,7 @@
                     \end{itemize}
                 \end{column}
                 \begin{column}{0.5\textwidth}
-
+                    Picture of SGD here maybe a loss surface and a bunch of small arrows in all directions
                 \end{column}
             \end{columns}
             \note{
@@ -795,6 +856,7 @@
     \begin{frame}
         \frametitle{Batching in NLP}
 
+        A vector of one lengths and a vector of a different length and something that shows how they can't be a batch
 
         \note{
             \begin{itemize}
@@ -812,6 +874,8 @@
     \begin{frame}
         \frametitle{Introducing \textless PAD\textgreater}
 
+        The same sentences as above but using pad to make them match
+
         \note{
             \begin{itemize}
                 \item We use a new symbol call \textless PAD\textgreater .
@@ -823,6 +887,8 @@
 
     \begin{frame}
         \frametitle{The lengths vector}
+
+        The same sentences as above but also show a vector of legnths for them
 
         \note{
             \begin{itemize}
@@ -841,6 +907,7 @@
 
 \begin{section}{Batching can Introduce Errors}
 
+    % Something is weird with the slides in the frame here
     \begin{subsection}{Mean Pooling}
         \begin{frame}
             \frametitle{Mean Pooling}
@@ -850,13 +917,13 @@
                     1 & 10 & 8 & 17 & 13 & 17
                 \end{array} \right] = \frac{66}{6} = 11.0
             $
-            \item[]
+            \item[]<1->
             \item[]<2->$
                 \left[ \begin{array}{*4{c}}
                     22 & 24 & 9 & 13
                 \end{array} \right] = \frac{68}{4} = 17.0
             $
-            \item[]
+            \item[]<3->
             \item[]<3->$
                 \left[ \begin{array}{*6{c}}
                     5 & 4 & 8 & 9 & 10 & 34 \\
@@ -882,7 +949,7 @@
                     \item Here we see the mean pooling for a vector of length 6
                     \item<2-> Here we see the mean pooling for a length of 4 (shorter)
                     \item<3-> How we see that in order to batch we need to pad the shorter vector
-                    \item<3-> No our denominator is much larger so our results is smaller!
+                    \item<3-> Now our denominator is much larger so our results is smaller!
                     \item<3-> Before I said that batching allows us to combine unrelated examples and calculate them in
                         one short but this illustrates the problems with padding,
                     \item<3-> When you padding goes wrong your results for some example will bleed over and effect
@@ -946,7 +1013,7 @@
                         score for the right class instead of scaling the score with the value on the label
                     \item Our loss is then the score sum of the score for each token,
                     \item This kind of loss is often used for language modeling where the label is the index of the next
-                        word or else sequence tagging where the label is the label tag.
+                        word or else sequence tagging where the label is the tokens tag.
                 \end{itemize}
             }
         \end{frame}
@@ -1061,12 +1128,11 @@
         \begin{frame}
             \frametitle{Attention}
 
+            Picture of seq2seq attention and transformer self attention here
+
             \note{
                 \begin{itemize}
                     \item Attention is used to contextualize a vector relative to others.
-                    \item First we calculate a score between the vectors
-                    \item Then we use the softmax so they sum to one and we can do a weighted average
-                    \item Then we do a weighted average of the vectors based on these calculated scores
                 \end{itemize}
             }
         \end{frame}
@@ -1074,31 +1140,456 @@
         \begin{frame}
             \frametitle{Attention}
 
+            \begin{align*}
+                q &= \begin{bmatrix}
+                        \vert \\
+                        q_1\\
+                        \vert
+                    \end{bmatrix} \\
+                V &= \begin{bmatrix}
+                         \vert & \vert & & \vert \\
+                         v_1 & v_2 & \cdots & v_n \\
+                         \vert & \vert & & \vert
+                     \end{bmatrix} \\
+                s &= \similar(q, V) = \begin{bmatrix}
+                        s_1 & s_2 & \cdots & s_n \\
+                    \end{bmatrix}
+            \end{align*}
+
             \note{
                 \begin{itemize}
-                    \item When you are cal
+                    \item First we calculate a score between the vectors
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Attention}
+            \begin{align*}
+                s &= \similar(q, V) = \begin{bmatrix}
+                        0.21 & -0.34 & \cdots & 0.55 \\
+                    \end{bmatrix} \\
+                \softmax(x) &= \frac{e^{x_i}}{\sum_j e^{x_j}} \\
+                \alpha &= \softmax(s) = \begin{bmatrix}
+                        0.1684 & 0.0977 & \cdots & 0.2379 \\
+                    \end{bmatrix} \\
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Then we use the softmax so they sum to one and we can do a weighted average
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Attention}
+            \begin{align*}
+                V &= \begin{bmatrix}
+                         \vert & \vert & & \vert \\
+                         v_1 & v_2 & \cdots & v_n \\
+                         \vert & \vert & & \vert
+                     \end{bmatrix} \\
+                s &= \similar(q, V) = \begin{bmatrix}
+                        s_1 & s_2 & \cdots & s_n \\
+                    \end{bmatrix} \\
+                \alpha &= \softmax(s) \\
+                v &= V * \alpha^{T} \\
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Then we do a weighted average of the vectors based on these calculated scores
+                    \item Now $v$ is a combination of the vectors in $V$ weighted by their attention scores which were
+                        calculated based on their similarity to q
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Attention}
+
+            \begin{align*}
+                V &= \begin{bmatrix}
+                        \vert & \vert & & \vert & \vert \\
+                        v_1 & v_2 & \cdots & \text{\textless PAD\textgreater} & \text{\textless PAD \textgreater} \\
+                        \vert & \vert & & \vert & \vert \\
+                     \end{bmatrix} \\
+                s &= \begin{bmatrix}
+                        s_1 & s_2 & \cdots & 0 & 0
+                     \end{bmatrix}
+            \end{align*}
+
+            \note{
+                \begin{itemize}
+                    \item But what happens when we calculate the similarity between vectors that have padding on them?
+                    \item With most similarity metrics (dot/scaled dot product) we get zeros for the similarity between
+                        a pad and a vector (assuming the pad is zeros)
+                    \item Is this enough to calculate the right thing?
+                    \item Would I have brought this up if it was?
+                \end{itemize}
+            }
+        \end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Attention}
+    \begin{pythoncode}
+  >>> x = np.array([
+          [0.32, 0.11, 0.83, 0.9, 0.4],
+          [0.5, 0.2, -1.0, 0, 0]
+      ])
+  >>> x
+  array([[ 0.32,  0.11,  0.83,  0.9 ,  0.4 ],
+         [ 0.5 ,  0.2 , -1.  ,  0.  ,  0.  ]])
+  >>> softmax(x)
+  array([[0.15759942, 0.12774761, 0.26244893, 0.28147862, 0.17072542],
+         [0.31476139, 0.23318098, 0.07023276, 0.19091244, 0.19091244]])
+    \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item Here we can see that when the scores going into the softmax are zero we will get non-zero scores out!
+            \item This means that when we do the mixing with the weighted average we will 
+            \item What we need to have there be zeros \textbf{After} the softmax which will zero out the contribution of
+                the padding
+        \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Attention}
+    \begin{pythoncode}
+  >>> mask = make_mask(np.array([5, 3]))
+  >>> mask
+  array([[1, 1, 1, 1, 1],
+         [1, 1, 1, 0, 0]], dtype=uint8)
+  >>> attn = softmax(x) * mask
+  >>> attn
+  array([[0.15759942, 0.12774761, 0.26244893, 0.28147862, 0.17072542],
+         [0.31476139, 0.23318098, 0.07023276, 0.        , 0.        ]])
+  >>> np.sum(attn, axis=1)
+  array([1.        , 0.61817513])
+  >>> softmax(x[1:np.newaxis, 0:3])
+  >>> array([[0.50917835, 0.3772086 , 0.11361305]])
+    \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item Ok, lets just mask out those padding weights, now their values are zero so they won't contribute to
+                the weighted average anymore.
+            \item But we see that the values don't sum to one any more!
+            \item This solution isn't enough
+            \item We all see that the values calculated for the sorter batch are very different then when calculated by
+                itself. Remember the whole point of batching is that we should be able to run multiple examples at once
+                and get the same values as if we ran them through one at a time
+        \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Attention}
+    \begin{pythoncode}
+  >>> inv_mask = (1 - mask) * -1e9
+  >>> masked_x = (x * mask) + inv_mask
+  >>> masked_x
+  array([[ 3.2e-01,  1.1e-01,  8.3e-01,  9.0e-01,  4.0e-01],
+         [ 5.0e-01,  2.0e-01, -1.0e+00, -1.0e+09, -1.0e+09]])
+  >>> softmax(masked_x)
+  array([[0.15759942, 0.12774761, 0.26244893, 0.28147862, 0.17072542],
+         [0.50917835, 0.3772086 , 0.11361305, 0.        , 0.        ]])
+  >>> softmax(x[1:np.newaxis, 0:3])
+  >>> array([[0.50917835, 0.3772086 , 0.11361305]])
+  >>> softmax(masked_x)sum(axis=1)
+  array([1., 1.])
+    \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item We need to hack softmax to force it to output zeros for the padded values while the other values sum
+                to one.
+            \item We know that the softmax will exponentiate each element and we know that any element to a negative
+                number of will approach zero as the exponent grows
+            \item With a sufficiently negative number we can force an element to zero
+            \item On this first line \texttt{(1 - mask)} will flip a mask of ones and zeros.
+            \begin{itemize}
+                \item $1 - 1 = 0$ and $1 - 0 = 1$
+                \item This will mean that the ones are now where the pads and zero where the valid elements are
+            \end{itemize}
+            \item Then we multiply in a very negative number so out mask is all zeros and this neg
+            \item We multiply by the mask to make sure the padding locations are zero then we add the inverse mask in
+            \item the inverse mask has all zeros for the valid elements so they don't change but it has $-1e^9$ for the
+                pad so zero + that negative is that negative
+            \item Now when we do the softmax we see that out values match and they sum to one in each axis
+        \end{itemize}
+    }
+\end{frame}
+
+        \begin{frame}
+            \frametitle{Attention}
+
+            A self attention picture here?
+
+            \note{
+                \begin{itemize}
+                    \item Masking in attention is also used in transformers to enforce casuality
+                    \item The mask stops the attention from looking forward in time
+                    \item This mask works the exact same way
+                    \item Sometimes you need to combine this causal mask and a length mask to make sure you aren't looking
+                        at tokens that don't exist
+                    \item Attention is an example where just masking out the value isn't enough, we actually have to
+                        manipulate the padding values in a specific way.
                 \end{itemize}
             }
         \end{frame}
 
     \end{subsection} % Attention
 
-    % \begin{subsection}{Conditional Random Field}
+    \begin{subsection}{Conditional Random Field}
 
-    % \end{subsection} % CRF
+        \begin{frame}
+            \frametitle{CRF}
 
-    % \begin{subsection}{Beam Search}
+            This needs a lot more
 
-    % \end{subsection} % Beam Search
+            CRF are used in sequence tagging to model dependencies in the output
 
-    % \begin{subsection}{Convolution 1D}
+            At each step we calculate the possible scores or transitioning to any state from any state
 
-    % \end{subsection} % Convolution
+            Once we hit the end we don't want to overwrite our scores with transistors into the padding
 
-    % \begin{subsection}{Max Pooling}
+            The CRF gives us a new way to handle batches, we essentially have an if, only update alpha if we are still
+            inside the valid lengths. We do an if by calculating the results of both branches (do nothing to the alpha
+            and calculate the next step) and use a mask to combine them.
 
-    % \end{subsection}
+            The Viterbi decoding works the same way
+
+        \end{frame}
+
+    \end{subsection} % CRF
+
+    \begin{subsection}{Max Pooling}
+
+        \begin{frame}
+            \frametitle{Max Pooling}
+            \begin{align*}
+                x &= \begin{bmatrix}
+                    1 & 0 & 4 & 3 & 2 & 0 & 0
+                \end{bmatrix}\\
+                \text{lengths} &= \begin{bmatrix} 5 \end{bmatrix} \\
+                \max(x) &= 4
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Pop Quiz: Here we have a vector, it has a length of 5 meaning the last two zeros are padding
+                    \item Lets say this vector just went through a ReLU $\max(0, x)$ so it will never have a negative
+                        number
+                    \item Is it save to do a max without thinking about padding?
+                    \item \textbf{YES}
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Max Pooling}
+            \begin{align*}
+                x &= \begin{bmatrix}
+                    -3 & -1 & -4 & -3 & -2 & 0 & 0
+                \end{bmatrix}\\
+                \text{lengths} &= \begin{bmatrix} 5 \end{bmatrix} \\
+                \max(x) &= 0 \\
+                \max(x[:5]) &= -1
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item What about a vector that looks like this?
+                    \item Max Pooling is often applied along a feature dimension when you have multiple words to select
+                        the highest value that feature takes on in any word
+                    \item Lets say here we are looking at a feature of a word right after embedding
+                    \item Your max pooling it going to output zero for each these!
+                    \item Your network will never see a negative value for most examples while training! (most examples
+                        are padded)
+                    \item Your network will see these values at test time and have no idea what to do!
+                    \item How do we fix this?
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Max Pooling}
+            \begin{align*}
+                x' &= \begin{bmatrix}
+                    -3 & -1 & -4 & -3 & -2 & -10000 & -10000
+                \end{bmatrix}\\
+                \text{lengths} &= \begin{bmatrix} 5 \end{bmatrix} \\
+                \max(x') &= -1
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item We use the same trick we used in attention, by setting the pads so a very negative value we
+                        can ensure they will never be picked
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Min Pooling}
+            \begin{align*}
+                x &= \begin{bmatrix}
+                    3 & 1 & 4 & 3 & 2 & 0 & 0
+                \end{bmatrix}\\
+                x' &= \begin{bmatrix}
+                    3 & 1 & 4 & 3 & 2 & 10000 & 10000
+                \end{bmatrix}\\
+                \text{lengths} &= \begin{bmatrix} 5 \end{bmatrix} \\
+                \min(x) &= 0 \\
+                \min(x[:5]) &= 1\\
+                \min(x') &= 1
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item This same thing applies in Min pooling but we where the padding can be selected as the minimum
+                        even if it isn't. We can solve this similarly but set the padding to a very high value.
+                \end{itemize}
+            }
+        \end{frame}
+
+    \end{subsection} % Max Pooling
+
+    \begin{subsection}{Convolution 1D}
+
+        \begin{frame}
+            \frametitle{Convolution 1D}
+            GIF of a convolution here?
+
+            \note{
+                \begin{itemize}
+                    \item Convolutions are used to process basically soft n-grams
+                    \item This is commonly used in text classification, the conv will look at multiple words at a time.
+                        To create a new representation that is the word contextualized by the words around it
+                    \item It is also common in taggers to use a convolution to create a representation of a word based
+                        on the characters.
+                \end{itemize}
+            }
+
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Convolution 1D}
+
+            Diagram of non padded conv creating a shorter vector across multiple slides
+
+            \note{
+                \begin{itemize}
+                    \item So this shows us how a convolution works, we look at a window, scale the values by a learned
+                        weight matrix (not shown here) and sum them to create a new value for this position.
+                    \item Unfortunately here we can see that a convolution will actually create a new, shorter sentence
+                    \item We need to introduce a new form of padding that I will call conv-padding to distinguish from
+                        the padding we have been talking about before
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Convolution 1D}
+
+            Diagram of padded conv creating a sequence of the same length
+
+            \note{
+                \begin{itemize}
+                    \item Here we can see we are adding a padding of zeros on each side
+                    \item There are filtersz // 2 units on each side
+                    \item We see here how we now get a vector that is the same length as the input (before padding)
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Convolution 1D}
+
+            Diagram of padded conv where there is extra padding
+
+            \note{
+                \begin{itemize}
+                    \item In this example we are zoommed in on an example that has already been padded, the two zeros at
+                        the end
+                    \item Now were are going to pad it again because the conv-padding is applied to the whole batch at
+                        once
+                    \item As we slide the conv we can see that at the end we have spots where the only part of the
+                        window is on the valid tokens but it is writing into the output vector.
+                    \item This is introducing a new value what could be selected by the max pool during training time
+                        that would never happen at test time.
+                    \item Does this matter? Yes, when I first noticed this but I trained a tagger on `Conll 2003` and
+                        the first thing I trained have slightly different results based on if it was run on a single
+                        example of batches so it seems very prevalent.
+                    \item "But how do I fix this one Brian?" This is one is pretty easy you just need to zero out the
+                        padded values after they go through the conv. If you are following it with maxpool you might
+                        want to just jumpr right to masking the pad values with a very negative number
+                \end{itemize}
+            }
+        \end{frame}
+
+    \end{subsection} % Convolution
 
 \end{section}
+
+\begin{section}{Defense}
+
+\begin{frame}[fragile]
+    \frametitle{Unit Tests}
+    \begin{pythoncode}
+def test_batch_stability():
+    ex1 = generate_example()
+    ext = generate_example()
+    res1 = network(ex1, lengths=[len(res1)])
+    res2 = network(ex2, lengths=[len(res2)])
+    batch, lengths = batch_examples(ex1, ex2)
+    res = network(batch, lenghts=lengths)
+    batch1, batch2 = extract_results(res, lengths)
+    np.testing.assert_allclose(batch1, ex1)
+    np.texting.assert_allclose(batch2, ex2)
+    \end{pythoncode}
+
+    \href{https://github.com/dpressel/mead-baseline/blob/f98e64afcbab8a267fce5d13a434a981aa564d27/python/tests/test_crf_pytorch.py#L265}{An
+    example of these tests in our CRF}
+
+    \note{
+        \begin{itemize}
+            \item The easiest way to avoid these errors is a unittest, There is a nice recipe for these batch
+                instability tests
+            \begin{enumerate}
+                \item Generate two examples with different lengths
+                \item Run each example through the thing you want to test and record results
+                \item Batch the two examples together
+                \item Run the batch through the thing you want to test
+                \item Extract the values that represent each example and compare them to the values from running solo
+            \end{enumerate}
+        \end{itemize}
+    }
+\end{frame}
+
+\end{section}
+
+\begin{frame}
+    \frametitle{Conclusion}
+    \begin{itemize}
+        \item Almost nothing is a safe when you are padding.
+        \item You should be passing lengths around for most things
+        \item Some frameworks help manage this and you should so them when you can.
+        \item These bugs are hard to found so you should be writing unittests designed to find them.
+    \end{itemize}
+    \note{
+        \begin{itemize}
+            \item as mentioned pytorch loss lets you handle token level losses easy
+            \item Most RNN implementations take a length parameter and handle this for you
+        \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}
+    \frametitle{Contact}
+    \begin{itemize}
+        \item \href{}{slides}
+        \item \href{}{twitter}
+        \item \href{}{github}
+    \end{itemize}
+    \note{
+        Thank you, any questions?
+    }
+\end{frame}
 
 \end{document}
