@@ -56,10 +56,19 @@
 
     \begin{frame}
         \frametitle{Slides}
-        This QR code has a link to the slides if you want to follow along.
         \begin{center}
+            This QR code has a link to the slides if you want to follow along.
+            \vspace{-1pt}
             \includegraphics[height=0.8\textheight]{images/qr.png}
         \end{center}
+        \note{
+            \begin{itemize}
+                \item This has links to the slides, the slides include the speaker notes which has a lot of the extra information
+                    I am going to say in this talk.
+                \item The speaker notes also has links to where I got the images and a few extra blog posts that can supplement
+                    my explanations on how these layers work.
+            \end{itemize}
+        }
     \end{frame}
 
     \begin{frame}
@@ -69,10 +78,10 @@
         \end{center}
         \note{
             \begin{itemize}
-                \item This QR code as a link to a compilation video of cats getting scared by cucumbers
-                \item In case you want to watch this instead of paying attention to the talk
+                \item This QR code as a link to a compilation video of cats getting scared by cucumbers.
+                \item I figured I would give it to you in case you want to watch this instead of paying attention to the talk.
                 \item Side Note: I have heard that this is very upsetting to the cats so I wouldn't recommend doing this
-                    to your cat but given that these people already filmed it I don't think it is \textit{that} bad to
+                    to your cat, but, given that these people already filmed it... I don't think it is \textit{that} bad to
                     have a laugh at it.
             \end{itemize}
         }
@@ -81,23 +90,24 @@
     \begin{frame}
         \frametitle{Me}
         \begin{itemize}
-            \item Work on NLP at Interactions
-            \item My specialization is in Deep Learning
-            \item Maintain \href{https://github.com/dpressel/mead-baseline}{Mead-Baseline}
+            \item I work on NLP at Interactions.
+            \item My specialization is in Deep Learning.
+            \item I maintain \href{https://github.com/dpressel/mead-baseline}{Mead-Baseline}.
         \end{itemize}
         \note{
             \begin{itemize}
-                \item This is my ``Why you should listen to me'' slide
-                \item I do NLP at interactions where we use NLP to ``facilitate customer care interactions'' aka build better chat bots
-                \item My specialization is DL and We use DL for most models so I have a lot of experience
+                \item This is my ``Why you should listen to me'' slide.
+                \item I do NLP at interactions where we use NLP to ``facilitate customer care interactions'' aka build
+                    better chat bots.
+                \item My specialization is DL and we use DL for most models so I have a lot of experience.
                 \item I help maintain Mead-Baseline, our open-source Deep Learning modeling software so I have a lot of
-                    experience writing Neural Networks for NLP
-                \item I have batched some complex operations for Mead-Baseline
+                    experience writing Neural Networks for NLP.
+                \item I have batched some complex operations for Mead-Baseline.
                 \begin{itemize}
                     \item Batched the CRF
                     \item Batched Beam Search
                 \end{itemize}
-                \item I have tracked down a lot of hidden batch instability problems
+                \item I have tracked down a lot of hidden batch instability problems.
                 \item I am trying to get more involved with research so if anyone needs help with some idea, especially if
                     the implementation is tricky, hit me up.
             \end{itemize}
@@ -1122,7 +1132,7 @@
                         from here}
                     \item We showed before that we can express batched operations as matrix matrix multiplications
                     \item Lucky for us humanity has gotten really good at doing these matmuls fast
-                    \item We have specialized libraries and even specialized devices like GPUs are designed to do these
+                    \item We have specialized libraries and even specialized devices, like GPUs, that are designed to do these
                         in a parallel and fast way
                     \item We can stand on the shoulders of gaming to train models really fast
                 \end{itemize}
