@@ -1004,7 +1004,7 @@
                     Pros:
                     \begin{itemize}
                         \item This is the true gradient
-                        \item You step is guaranteed to yield better performance on all examples
+                        \item Your step is guaranteed to yield better performance on all examples
                     \end{itemize}
                     Cons:
                     \begin{itemize}
@@ -1039,7 +1039,7 @@
                     Pros:
                     \begin{itemize}
                         \item You get to update your parameters each step.
-                        \item You can get better generalization because to the randomness.
+                        \item You can get better generalization because to the randomness in steps.
                     \end{itemize}
                     Cons:
                     \begin{itemize}
@@ -1076,7 +1076,7 @@
                 \begin{column}{0.5\textwidth}
                     Cons:
                     \begin{itemize}
-                        \item Your need to run the examples in a batch which can be tricky.
+                        \item You need to run the examples in a batch which can be tricky.
                         \item Minibatch size is now a hyperparameter.
                     \end{itemize}
                 \end{column}
@@ -1206,9 +1206,9 @@
             \item In NLP we have an idea of embedding
             \item This is a lookup from word id to a vector representing the word
             \item The principled approach is force the vector for \textless PAD\textgreater \hspace{1pt} to be all zeros
-            \item Pytorch \texttt{nn.Embedding} has a \texttt{padding\_idx} parameter that will for the vector with
+            \item Pytorch \texttt{nn.Embedding} has a \texttt{padding\_idx} parameter that will force the vector with
                     that index to be zero.
-            \item Tensorflow you need to role your own.
+            \item In Tensorflow you need to role your own.
                 \href{https://github.com/dpressel/mead-baseline/blob/f98e64afcbab8a267fce5d13a434a981aa564d27/python/baseline/tf/tfy.py\#L656}{This is an example of doing that in Mead-Baseline}
         \end{itemize}
         \note{
@@ -1978,9 +1978,9 @@ array([3, 1, 5])
         \begin{itemize}
             \item In this example we can see how we can use create masks that represent conditionals.
             \item First we track how far we are into the loop with the $i$ variable.
-            \item First we calculate the updated alphas regardless of whether we are padding or not
+            \item First we calculate the updated $\alpha$s regardless of whether we are padding or not
             \item Then we make a mask where we have ones if we are inside the valid lengths
-            \item Then we update the alphas based on the mask so that we only update the ones we should.
+            \item Then we update the $\alpha$s based on the mask so that we only update the ones we should.
         \end{itemize}
     }
 \end{frame}
@@ -2035,9 +2035,9 @@ array([3, 1, 5])
             \begin{itemize}
                 \item When we predict actual tags from a CRF we use the Viterbi algorithm to find the maximum scoring
                     path.
-                \item The algorithm is the exact same as the forward algorithm except that use us a $\max$ instead of a
-                    $\logsumexp$ when computing the new $\alphas$
-                \item $\alpha$ now represents the maximum score of any path that ends at each class
+                \item The Viterbi algorithm is the exact same as the forward algorithm except that it uses a $\max$ instead of a
+                    $\logsumexp$ when computing the new $\alpha$s.
+                \item $\alpha$ now represents the maximum score of any path that ends at each class.
                 \item We can using the exact same padding trick when doing Viterbi decoding!
             \end{itemize}
             \note{
@@ -2183,6 +2183,11 @@ array([3, 1, 5])
                     \item We can solve this similarly but set the padding to a very high value.
                 \end{itemize}
             }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Max Pooling Results}
+
         \end{frame}
 
     \end{subsection} % Max Pooling
@@ -2541,7 +2546,7 @@ array([3, 1, 5])
 
             \note{
                 \begin{itemize}
-                    \item In this example we are zoommed in on an example that has already been padded, the two zeros at
+                    \item In this example we are zoomed in on an example that has already been padded, the two zeros at
                         the end
                     \item Now were are going to pad it again because the conv-padding is applied to the whole batch at
                         once
@@ -2596,7 +2601,7 @@ array([3, 1, 5])
                 \begin{itemize}
                     \item Elmo has this batch instability bug too, but given their cavalier attitude to the RNN hidden states
                         I think the engineering in Elmo is pretty from the hip so they probably don't care. This is a
-                        rant for anther time so I will move on.
+                        rant for another time so I will move on.
                     \item An Interesting observation is that for the last use case I don't think we really need to care,
                         padding in a later stage (CRF or the token level loss) should save us.
                     \item "But how do I fix this one Brian?"
