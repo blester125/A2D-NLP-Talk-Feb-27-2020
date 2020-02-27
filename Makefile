@@ -7,6 +7,7 @@ slides: $(SLIDES_DIR)/slides.tex
 	cd $(SLIDES_DIR)
 	$(LATEX) --shell-escape slides.tex
 	$(LATEX) --shell-escape slides.tex
+	cp slides.pdf ../Your-Neural-Network-Is-Probably-Wrong.pdf
 
 clean:
 	cd $(SLIDES_DIR)
