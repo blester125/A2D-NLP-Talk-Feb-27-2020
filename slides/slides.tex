@@ -65,7 +65,7 @@
             \begin{itemize}
                 \item This has links to the slides, the slides include the speaker notes which has a lot of the extra information
                     I am going to say in this talk.
-                \item The speaker notes also has links to where I got the images and a few extra blog posts that can supplement
+                \item The speaker notes also have links to where I got the images and a few extra blog posts that can supplement
                     my explanations on how these layers work.
             \end{itemize}
         }
@@ -129,7 +129,8 @@
             \end{align*}
         \note{
             \begin{itemize}
-                \item First I'm going to build up batching through building examples by starting with Binary LR
+                \item First I'm going to build up to batching by doing more and more work in a single function call. We
+                    start with Binary LR
                 \item In binary LR we have a vector representing features and a vector of the same size representing
                     weights
                 \item (Normally in NLP we have sparse features where we don't have a actual vector of features, we would use
@@ -137,7 +138,7 @@
                     dense vectors here because it is just a pedagogical example)
                 \item We take the sum of the features weighted by the weight to create a score which we call a logit.
                 \item This operation is called the dot product.
-                \item Normally we then us a function like sigmoid to create a final probability (and then calculate
+                \item Normally we then use a function like sigmoid to create a final probability (and then calculate
                     losses and gradients) but we don't need to worry about that for this example.
             \end{itemize}
         }
@@ -151,7 +152,7 @@
     \note{
         \begin{itemize}
             \item In this example we are representing our feature and weights as numpy vectors
-            \item W can use the dot product function which to calculate the sum of the element wise products of the
+            \item We can use the dot product function to calculate the sum of the elementwise product of the
                 vectors.
         \end{itemize}
     }
@@ -259,7 +260,7 @@
                 \begin{itemize}
                     \item We now extend to multi-class LR
                     \begin{itemize}
-                        \item In binary LR we are deciding between to things for example Positive or Negative sentiment
+                        \item In binary LR we are deciding between two things, for example Positive or Negative sentiment
                         \item In multi-class LR we are deciding between multi classes, for example Science, Technology,
                             Politics, cooking, and video games for document classification
                     \end{itemize}
@@ -992,7 +993,7 @@
                         together independent weight vectors to calculate the scores for multiple examples at once.
                     \item This works because the rows and columns in matrix-matrix multiplication all act independently
                         of each other.
-                    \item This means we can put otally unrelated data an be next to each other and they won't interact as it flows through
+                    \item This means we can put totally unrelated data an be next to each other and they won't interact as it flows through
                         your network
                     \item Running multiple examples like this is what we mean by batching.
                 \end{itemize}
@@ -1204,7 +1205,7 @@
         \note{
             \begin{itemize}
                 \item Now lets look at how we can handle batching things of different lengths.
-                \item We are going to use a new symbol call \textless PAD\textgreater .
+                \item We are going to use a new symbol called \textless PAD\textgreater .
                 \item We add this to the end of shorter sentence so that all the sentences in a batch have the sample length.
                 \item Now that they are all the same length we can turn them into a matrix.
             \end{itemize}
@@ -1216,6 +1217,7 @@
         \begin{itemize}
             \item In NLP we have this idea of an ``embedding''.
             \item This is a mapping from a word id to a vector that represents the word.
+            \item We call each of the dimensions in the vector a feature.
             \item The principled approach is force the vector for \textless PAD\textgreater \hspace{1pt} to be all
                 zeros.
             \item Pytorch \texttt{nn.Embedding} has a \texttt{padding\_idx} parameter that will force the vector with
@@ -1252,7 +1254,7 @@
 
         \note{
             \begin{itemize}
-                \item Now that some of our examples are longer because if this \textless PAD\textgreater we need to track how long the
+                \item Now that some of our examples are longer because of this \textless PAD\textgreater we need to track how long the
                     actual data is
                 \item We store this in a lengths vector
                 \item This will be a vector of the same length as the number of items in the batch
@@ -1279,7 +1281,8 @@
                     \item As a warm up we are going to look at Mean Pooling.
                     \item The main use-case of mean pooling is in the Neural Bag of Words model.
                     \item We embed each word resulting in a matrix that is sentence length by embedding size
-                    \item We do a mean over each time, so each feature is mean-ed separately
+                    \item We do a mean over time for each feature, this means feature is mean-ed separately by looking
+                        at it's value for each individual word.
                     \item This results in a sentence vector that we can then use for classification
                 \end{itemize}
             }
@@ -1328,8 +1331,8 @@
                     \item<3-> Before I said that batching allows us to combine unrelated examples and calculate them in
                         one short and get the same results as if you had calculated them independently
                     \item<3-> When your padding goes wrong the results for an example will be dependent on the other
-                        things in the batch. When these padding cases information to bleed across examples this
-                        independence is broken and our calculations will be wrong.
+                        things in the batch. Padding can cause bleeding of information examples and our
+                        independence is broken thus our calculations will be wrong.
                 \end{itemize}
             }
         \end{frame}
@@ -1383,10 +1386,10 @@
                 \begin{itemize}
                     \item Out next example of where padding can get up to no good is in our loss functions
                     \item Our normal loss is the cross entropy loss between two vectors
-                    \item $y$ is the vector that has a our labels and $\hat{y}$ is out predicted labels
+                    \item $y$ is the vector that has our real labels and $\hat{y}$ is our predicted labels
                     \item cross entropy is a measure of the difference between two distributions
                     \item The cross entropy is the sum of the true value times the log of the predicted values
-                    \item In classifiction where we output a probability distribution over classes we can use this loss
+                    \item In classification where we output a probability distribution over classes we can use this loss
                         function to train the model
                 \end{itemize}
             }
@@ -1425,7 +1428,7 @@
 
             \note{
                 \begin{itemize}
-                    \item This idea of sparse cross entropy can be extend to the idea of a token level loss.
+                    \item This idea of sparse cross entropy can be extended to the idea of a token level loss.
                     \item This means that a decision is made for every token and we calculate the loss for the
                         probability vector that is output for each token in a sentence.
                     \item We will see soon how this loss at the padding positions can mess us up.
@@ -1540,7 +1543,7 @@
                     \item We can then sum the values (or mean them with the lengths if you want).
                     \item Some toolkits like Pytorch can handle this for you, you give a value to the
                         \texttt{padding\_idx} parameter and it will ignore values where the label is that padding index
-                    \item Toolkits like tensorflow will probably make you do this our self.
+                    \item Toolkits like tensorflow will probably make you do this yourself.
                 \end{itemize}
             }
         \end{frame}
@@ -1740,7 +1743,7 @@
                 contribute to the weighted average anymore.
             \item Is this ok?
             \item We can see that the values for this example don't sum to one any more, this solution isn't enough
-            \item We we can also see that the values calculated for the sorter batch are very different then when that
+            \item We we can also see that the values calculated for the shorter example are very different than when that
                 example is calculated by itself.
             \item Remember the whole point of batching is that we should be able to run multiple examples at once
                 and get the same values as if we ran them through one at a time
@@ -1831,8 +1834,8 @@
             \note{
                 \begin{itemize}
                     \item This is our most complex example so it is ok if you don't understand everything
-                    \item In our token level loss from before we made decision about the label of a token without
-                        considering the label we chose for the last one.
+                    \item In our token level loss from before we made a decision about the label of a token without
+                        considering the label we chose for the last token.
                     \item Here is this factor graph diagram of a CRF we see that the label decisions are conditioned on
                         the previous label. This makes the CRF a global model.
                     \item In the token level loss our scores and therefore the label decision were contextual in that
@@ -2057,7 +2060,8 @@ array([3, 1, 5])
             \note{
                 \begin{itemize}
                     \item A way to look at these two algorithms is that they are the same algorithm using different
-                        semirings. We basically define different operations for sums and additions
+                        semirings. A semirings is basically a re-definition of math in some contenxt that uses different
+                        operations for sums and additions
                         \begin{itemize}
                             \item The CRF forward is on the log semiring where the addition is a log sum exp addition
                             \item The Viterbi algorithm is on the Viterbi semiring where the addition is a maximum
@@ -2362,7 +2366,7 @@ array([3, 1, 5])
                     \item Here we can see how conv-padding can be used to stop the sequence from getting shorter
                     \item Here we can see we are adding a padding of zeros on each side
                     \item There are filtersz // 2 units on each side
-                    \item Another advantage of this conv-padding is that without padding there is on;y a single
+                    \item Another advantage of this conv-padding is that without padding there is only a single
                         calculation that involves the first word. conv-padding makes it so that there is more
                         information from the tokens on each end.
                     \item We see here how we now get a vector that is the same length as the input (before padding)
