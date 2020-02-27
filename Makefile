@@ -6,6 +6,7 @@ SLIDES_DIR := slides
 slides: $(SLIDES_DIR)/slides.tex
 	cd $(SLIDES_DIR)
 	$(LATEX) --shell-escape slides.tex
+	$(LATEX) --shell-escape slides.tex
 
 clean:
 	cd $(SLIDES_DIR)

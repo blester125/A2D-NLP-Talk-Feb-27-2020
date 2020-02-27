@@ -45,6 +45,7 @@
 \def\N{\mathbb{N}}
 \newcommand{\softmax}{\mathop{\rm softmax}\nolimits}
 \newcommand{\similar}{\mathop{\rm sim}\nolimits}
+\newcommand{\logsumexp}{\mathop{\rm logsumexp}}
 
 \begin{document}
 
@@ -60,11 +61,12 @@
         \end{itemize}
         \note{
             \begin{itemize}
-                \item Why you should listen to me
-                \item We use NLP to ``facilitate customer care interactions'' aka build better chat bots
-                \item We use DL for most models so I have a lot of experience
-                \item I help maintain Mead-Baseline, our open-source Deep Learning modeling software
-                \item I have batched some complex operations
+                \item This is my ``Why you should listen to me'' slide
+                \item I do NLP at interactions where we use NLP to ``facilitate customer care interactions'' aka build better chat bots
+                \item My specialization is DL and We use DL for most models so I have a lot of experience
+                \item I help maintain Mead-Baseline, our open-source Deep Learning modeling software so I have a lot of
+                    experience writing Neural Networks for NLP
+                \item I have batched some complex operations for Mead-Baseline
                 \begin{itemize}
                     \item Batched the CRF
                     \item Batched Beam Search
@@ -91,15 +93,16 @@
             \end{align*}
         \note{
             \begin{itemize}
-                \item First we are going to show some examples of how batching works starting with Binary LR
+                \item First I'm going to build up batching through building examples by starting with Binary LR
                 \item In binary LR we have a vector representing features and a vector of the same size representing
                     weights
-                \item (Normally in NLP we have sparse features where we don't have a actual vector of features and use
-                    something like a hashmap instead but inside a neural network everything is dense so we will use
-                    dense here)
-                \item We take the sum of the features weighted by the weights. This is our logit
-                \item Normally we then us a function like sigmoid to create a final probability but we don't need to
-                    worry about that for now.
+                \item (Normally in NLP we have sparse features where we don't have a actual vector of features, we would use
+                    something like a hashmap instead, but inside a neural network everything is dense vectors so we will use
+                    dense vectors here because it is just a pedagogical example)
+                \item We take the sum of the features weighted by the weight to create a score which we call a logit.
+                \item This operation is called the dot product.
+                \item Normally we then us a function like sigmoid to create a final probability (and then calculate
+                    losses and gradients) but we don't need to worry about that for this example.
             \end{itemize}
         }
         \end{frame}
@@ -111,11 +114,33 @@
     \end{pythoncode}
     \note{
         \begin{itemize}
-            \item We are representing our feature and weights as numpy vectors
-            \item we can use the dot product which is the sum of the products of elements in the vectors
+            \item In this example we are representing our feature and weights as numpy vectors
+            \item W can use the dot product function which to calculate the sum of the element wise products of the
+                vectors.
         \end{itemize}
     }
 \end{frame}
+
+        \begin{frame}
+            \frametitle{Binary Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & 1 & 2 & 3 & 4 &
+                    \end{array}
+                    \right] \\
+                w &= \left[ \begin{array}{*6{c}}
+                    & 5 & 6 & 7 & 8 &
+                    \end{array}
+                    \right] \\
+                s &=
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we can see our feature vector and our weight vector
+                    \item Now lets look at the mechanics of what is happening in our dot product calculation
+                \end{itemize}
+            }
+        \end{frame}
 
         \begin{frame}
             \frametitle{Binary Logistic Regression}
@@ -134,7 +159,6 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we see the mechanics of what is happening in our dot product
                     \item We multiply these terms together and add the result into the s
                 \end{itemize}
             }
@@ -157,8 +181,6 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we see the mechanics of what is happening in our dot product
-                    \item We multiply these terms together and add the result into the s
                     \item And it continues on like this.
                 \end{itemize}
             }
@@ -181,7 +203,8 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we highlight the elements in these arrays that interact with each other.
+                    \item Here we highlight the elements in these arrays that interact with each other in our dot
+                        product.
                 \end{itemize}
             }
         \end{frame}
@@ -198,16 +221,21 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item We now extend to multi class where instead of deciding between 2 class (0 and 1) we will
-                        decide between several.
-                    \item We still have a feature vector
-                    \item We now have multiple weight vectors one for each class
-                    \item We pack our weight vectors into a single matrix of size n by c
+                    \item We now extend to multi-class LR
+                    \begin{itemize}
+                        \item In binary LR we are deciding between to things for example Positive or Negative sentiment
+                        \item In multi-class LR we are deciding between multi classes, for example Science, Technology,
+                            Politics, cooking, and video games for document classification
+                    \end{itemize}
+                    \item We still have a feature vector for some document.
+                    \item We now have multiple weight vectors, one for each class
+                    \item We pack our weight vectors into a single matrix of size n (the number of features we have) by c (which is the number of classes
+                        we have).
                     \item Now our logits are a vector, we have a score for each class
-                    \item for each class we do this same dot product between the feature vector and one of the weight
+                    \item for each class we do this dot product between the feature vector and one of the weight
                         vectors
                     \item Once we have the score we normally turn it into probabilities with the softmax function but we
-                        can skip this for now.
+                        can skip this for this example.
                 \end{itemize}
             }
 
@@ -223,8 +251,9 @@
     \end{pythoncode}
     \note{
         \begin{itemize}
-            \item Here we see code that calculates it exactly how I described it before where we explicitly do the dot
-                between the feature and each weight vector in turn
+            \item Here we see code that calculates the logits how I described it before.
+            \item where we explicitly do the dot between the feature and each weight vector in turn
+            \item We turn the results into a vector at the end
         \end{itemize}
     }
 \end{frame}
@@ -236,10 +265,39 @@
     \end{pythoncode}
     \note{
         \begin{itemize}
-            \item We can actually do this in a single dot product! Lets see why
+            \item But it turns out we can actually do this in a single dot product! Lets see why
         \end{itemize}
     }
 \end{frame}
+
+        \begin{frame}
+            \frametitle{Multi-class Logistic Regression}
+            \begin{align*}
+                f &= \left[ \begin{array}{*6{c}}
+                    & 1 & 2 & 3 & 4 &
+                    \end{array}
+                    \right] \\
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & 9  & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                s &= \left[ \begin{array}{*4{c}}
+                    & & &
+                    \end{array}
+                    \right] \\
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we can see our feature vector again and see our new weight matrix
+                    \item Note how the weight matrix is two weight vectors next to each other
+                    \item The first column is the same weight vector we saw earlier
+                    \item Lets explore how the elements of the feature vector and weight matrix are combined
+                \end{itemize}
+            }
+        \end{frame}
 
         \begin{frame}
             \frametitle{Multi-class Logistic Regression}
@@ -265,9 +323,9 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we can see our feature vector and see our new weight metric
-                    \item We how the weight matrix is two weight vectors next to each other
-                    \item Here we see the elements of the feature vector and weight matrix are combined
+                    \item Here we can see that we multiply an element from the feature vector and the first column of
+                        the weight matrix
+                    \item We save this value into the score vector
                 \end{itemize}
             }
         \end{frame}
@@ -296,9 +354,6 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we can see our feature vector and see our new weight metric
-                    \item We how the weight matrix is two weight vectors next to each other
-                    \item Here we see the elements of the feature vector and weight matrix are combined
                     \item And it goes on like this...
                 \end{itemize}
             }
@@ -329,10 +384,6 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we can see our feature vector and see our new weight metric
-                    \item We how the weight matrix is two weight vectors next to each other
-                    \item Here we see the elements of the feature vector and weight matrix are combined
-                    \item And it goes on like this...
                     \item We see here that the value in this first spot of the logits was calculated between the feature
                         vector and the first column in the weight matrix
                 \end{itemize}
@@ -363,9 +414,8 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we can see our feature vector and see our new weight metric
-                    \item We how the weight matrix is two weight vectors next to each other
-                    \item Here we see the elements of the feature vector and the second column weight matrix are combined
+                    \item Here we see the elements of the feature vector and the second column weight matrix are
+                        combined and saved into the second element of the logit vector
                 \end{itemize}
             }
         \end{frame}
@@ -387,16 +437,13 @@
                     \right] \\
                 \Highlight[second]
                 s &= \left[ \begin{array}{*4{c}}
-                    & 70 & \tikzmark{left}{9}\tikzmark{right}{} &
+                    & 70 & \tikzmark{left}{29}\tikzmark{right}{} &
                     \end{array}
                     \right] \\
                 \Highlight[thrid]
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we can see our feature vector and see our new weight metric
-                    \item We how the weight matrix is two weight vectors next to each other
-                    \item Here we see the elements of the feature vector and the second column weight matrix are combined
                     \item And it goes on like this...
                 \end{itemize}
             }
@@ -419,17 +466,13 @@
                     \right] \\
                 \Highlight[second]
                 s &= \left[ \begin{array}{*4{c}}
-                    & 70 & \tikzmark{left}{9}\tikzmark{right}{} &
+                    & 70 & \tikzmark{left}{110}\tikzmark{right}{} &
                     \end{array}
                     \right] \\
                 \Highlight[third]
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we can see our feature vector and see our new weight metric
-                    \item We how the weight matrix is two weight vectors next to each other
-                    \item Here we see the elements of the feature vector and the second column weight matrix are combined
-                    \item And it goes on like this...
                     \item We see here that the value in the second spot of the logits was calculated between the feature
                         vector and the second column in the weight matrix
                     \item So we can see here that we can calculate the logits for multiple classes at once between there
@@ -451,15 +494,19 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item We just saw how you can calculate the scores for multiple classes of a single example in a
+                    \item We just saw how you can calculate the scores for multiple classes for a single example in a
                         single vector-matrix multiply. Now we will see how you can actually do this for multiple
                         examples at once.
-                    \item Here we see Batched Logistic Regression
-                    \item Like before we still have a weight matrix of n by c
-                    \item Now we have stacked multiple feature vectors into a feature matrix with b rows where each row
+                    \item Here we see Batched Multi-class Logistic Regression.
+                    \item This means that we are doing multi-class LR but will process multiple examples at once
+                    \item Like before we still have a weight matrix of $n$ by $c$
+                    \item In this case we have $b$ examples
+                    \item Now we have stacked multiple feature vectors into a feature matrix with $b$ rows where each row
                         represents a different feature vector.
                     \item Now our scores are a matrix were each row is the scores for an example and each column is the
                         score for some class
+                    \item We could calculate this by doing the dot product of each feature vector and the weight matrix
+                        and stacking the results into our score matrix
                 \end{itemize}
             }
         \end{frame}
@@ -476,6 +523,8 @@
         \begin{itemize}
             \item Here we see a straight forward way to do this, where we loop over the features and calculate the
                 scores for each example separately.
+            \item The dot product of the feature vector and weight matrix returns a vector
+            \item We collect these vectors and stack them into a single array
         \end{itemize}
     }
 \end{frame}
@@ -489,9 +538,40 @@
         \begin{itemize}
             \item But we can actually do one better, we can calculate the whole thing, all classes for all examples in a
                 single shot!
+            \item Lets take a closer look
         \end{itemize}
     }
 \end{frame}
+
+        \begin{frame}
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                F &= \left[ \begin{array}{*6{c}}
+                    & 1 & 2 & 3 & 4 & \\
+                    & 13 & 14 & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & 9  & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                s &= \left[ \begin{array}{*4{c}}
+                    & & & \\
+                    & & &
+                    \end{array}
+                    \right] \\
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see our new feature matrix is two feature vectors stacked on top of each other
+                    \item Our weight matrix is still a n by c matrix of weight vectors standing next to each other
+                    \item We are now doing matrix matrix multiplication
+                \end{itemize}
+            }
+        \end{frame}
 
         \begin{frame}
             \frametitle{Batched Multi-class Logistic Regression}
@@ -519,10 +599,7 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we see our new feature matrix is two feature vectors stacked on top of each other
-                    \item Our weight matrix is still a n by c matrix of weight vectors standing next to each other
-                    \item We are now doing matrix matrix multiplication
-                    \item Here we see the values for the first class of the first example are using the values in the first
+                    \item Here we see the values for the first class of the first example are computed using the values in the first
                         row of the feature vector and the first column of the weight matrix
                 \end{itemize}
             }
@@ -546,7 +623,7 @@
                     \right] \\
                 \Highlight[second]
                 s &= \left[ \begin{array}{*4{c}}
-                    & \tikzmark{left}{5} \tikzmark{right}{} & & \\
+                    & \tikzmark{left}{17} \tikzmark{right}{} & & \\
                     & & &
                     \end{array}
                     \right] \\
@@ -554,10 +631,7 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we see our new feature matrix is two feature vectors stacked on top of each other
-                    \item Our weight matrix is still a n by c matrix of weight vectors standing next to each other
-                    \item We are now doing matrix matrix multiplication
-                    \item Here we see the values for the first class of the first example are using the values in the first
+                    \item Here we see the values for the first class of the first example are computed using the values in the first
                         row of the feature vector and the first column of the weight matrix
                 \end{itemize}
             }
@@ -589,18 +663,74 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we see that the first example first class was only calculated by looking at the first row
-                        and first column, nothing else was used.
+                    \item Here we see the values for the first class of the first example are computed using the values in the first
+                        row of the feature vector and the first column of the weight matrix
                 \end{itemize}
             }
         \end{frame}
 
         \begin{frame}
-            Put two slides of the first row and second column here
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                F &= \left[ \begin{array}{*6{c}}
+                    & \tikzmark{left}{1}\tikzmark{right}{} & 2 & 3 & 4 & \\
+                    & 13 & 14 & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & \tikzmark{left}{9}\tikzmark{right}{} & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & \tikzmark{left}{9} \tikzmark{right}{} & \\
+                    & & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see the values for the second class of the first example are computed using the values in the first
+                        row of the feature vector and the second column of the weight matrix
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
-            Put two slides of the first row and second column here
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                F &= \left[ \begin{array}{*6{c}}
+                    & 1 & \tikzmark{left}{2}\tikzmark{right}{} & 3 & 4 & \\
+                    & 13 & 14 & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & 9 \\
+                    & 6 & \tikzmark{left}{10}\tikzmark{right}{} & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & \tikzmark{left}{29} \tikzmark{right}{} & \\
+                    & & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see the values for the second class of the first example are computed using the values in the first
+                        row of the feature vector and the second column of the weight matrix
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
@@ -629,18 +759,74 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item and now we can see here that the first example, second class is only using the first row of
-                        the feature matrix and the last column of the weight matrix
+                    \item Here we see the values for the second class of the first example are computed using the values in the first
+                        row of the feature vector and the second column of the weight matrix
                 \end{itemize}
             }
         \end{frame}
 
         \begin{frame}
-            Put two slides of the second row and first column here
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                F &= \left[ \begin{array}{*6{c}}
+                    & 1 & 2 & 3 & 4 & \\
+                    & \tikzmark{left}{13}\tikzmark{right}{} & 14 & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & \tikzmark{left}{5}\tikzmark{right}{} & 9  & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & 110 & \\
+                    & \tikzmark{left}{65}\tikzmark{right}{} & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see the values for the first class of the second example are computed using the values
+                        in the second row of the feature vector and the first column of the weight matrix
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
-            Put two slides of the second row and first column here
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                F &= \left[ \begin{array}{*6{c}}
+                    & 1 & 2 & 3 & 4 & \\
+                    & 13 & \tikzmark{left}{14}\tikzmark{right}{} & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & 9 \\
+                    & \tikzmark{left}{6}\tikzmark{right}{} & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & 110 & \\
+                    & \tikzmark{left}{149}\tikzmark{right}{} & &
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see the values for the first class of the second example are computed using the values
+                        in the second row of the feature vector and the first column of the weight matrix
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
@@ -669,18 +855,74 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Similar to above the second example first class uses the second row of the features and the
-                        first column of the weights
+                    \item Here we see the values for the first class of the second example are computed using the values
+                        in the second row of the feature vector and the first column of the weight matrix
                 \end{itemize}
             }
         \end{frame}
 
         \begin{frame}
-            Put two slides of the second row and second column here
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                F &= \left[ \begin{array}{*6{c}}
+                    & 1 & 2 & 3 & 4 & \\
+                    & \tikzmark{left}{13}\tikzmark{right}{} & 14 & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & \tikzmark{left}{9}\tikzmark{right}{} & \\
+                    & 6 & 10 & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & 110 & \\
+                    & 382 & \tikzmark{left}{117} \tikzmark{right}{}&
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see the values for the second class of the second example are computed using the values
+                        in the second row of the feature vector and the second column of the weight matrix
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
-            Put two slides of the second row and second column here
+            \frametitle{Batched Multi-class Logistic Regression}
+            \begin{align*}
+                F &= \left[ \begin{array}{*6{c}}
+                    & 1 & 2 & 3 & 4 & \\
+                    & 13 & \tikzmark{left}{14}\tikzmark{right}{} & 15 & 16 &
+                    \end{array}
+                    \right] \\
+                \Highlight[first]
+                W &= \left[ \begin{array}{*4{c}}
+                    & 5 & 9 \\
+                    & 6 & \tikzmark{left}{10}\tikzmark{right}{} & \\
+                    & 7 & 11 & \\
+                    & 8 & 12 &
+                    \end{array}
+                    \right] \\
+                \Highlight[second]
+                s &= \left[ \begin{array}{*4{c}}
+                    & 70 & 110 & \\
+                    & 382 & \tikzmark{left}{117} \tikzmark{right}{}&
+                    \end{array}
+                    \right] \\
+                \Highlight[third]
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item Here we see the values for the second class of the second example are computed using the values
+                        in the second row of the feature vector and the second column of the weight matrix
+                \end{itemize}
+            }
         \end{frame}
 
         \begin{frame}
@@ -714,9 +956,9 @@
                         together independent weight vectors to calculate the scores for multiple examples at once.
                     \item This works because the rows and columns in matrix-matrix multiplication all act independently
                         of each other.
-                    \item Totally unrelated data an be next to each other and they won't interact as it flows through
+                    \item This means we can put otally unrelated data an be next to each other and they won't interact as it flows through
                         your network
-                    \item Running multiple examples is what we mean by batching.
+                    \item Running multiple examples like this is what we mean by batching.
                 \end{itemize}
             }
         \end{frame}
@@ -731,12 +973,12 @@
 
             \begin{columns}
                 \begin{column}{0.5\textwidth}
-                    Picture representing Full GD Here, maybe a long and strong arrow?
+                    \includegraphics[width=\textwidth]{images/full-gradient-descent.png}
                 \end{column}
                 \begin{column}{0.5\textwidth}
                     Pros:
                     \begin{itemize}
-                        \item This is the True gradient
+                        \item This is the true gradient
                         \item You step is guaranteed to yield better performance on all examples
                     \end{itemize}
                     Cons:
@@ -759,6 +1001,8 @@
                         better next time
                     \item This is slow because you have to weight to run the network on all your data before you update
                         any parameters
+                    \item In this picture we can see the big strides in the right direction
+                    \item \href{https://commons.wikimedia.org/w/index.php?curid=20569355}{Image from here}
                 \end{itemize}
             }
         \end{frame}
@@ -779,7 +1023,7 @@
                     \end{itemize}
                 \end{column}
                 \begin{column}{0.5\textwidth}
-                    Picture of SGD here maybe a loss surface and a bunch of small arrows in all directions
+                    \includegraphics[width=\textwidth]{images/sgd.png}
                 \end{column}
             \end{columns}
             \note{
@@ -787,6 +1031,8 @@
                     \item On the opposite end of the spectrum we have stochastic gradient descent
                     \item We calculate a gradient and update parameters after each example
                     \item Talk about pros and cons
+                    \item In this image we can see how much more random the gradients are
+                    \item \href{https://www.researchgate.net/figure/The-two-phase-of-Stochastic-Gradient-Descent-SGD-The-dynamics-consists-of-two-distinct_fig2_315096425}{Image from here}
                 \end{itemize}
             }
 
@@ -814,6 +1060,8 @@
                 \begin{itemize}
                     \item This is a happy middle ground between the two
                     \item We calculate the gradient for a small batch of examples and update
+                    \item Talk about pros and cons
+                    \item We can run this mini-batch together via batching
                 \end{itemize}
             }
         \end{frame}
@@ -821,28 +1069,36 @@
         \begin{frame}
             \frametitle{Gradient Accumulation?}
             \begin{itemize}
-                \item We want to have batches for training dynamics
-                \item Why do I actually have to batch?
-                \item Can't I just run each example individually and accumulate the gradients in memory and apply them
-                    when I get enough?
+                \item We saw before that we want to have batches for training dynamics
+                \item Why do you have to actually run things at once as a single batch?
+                \item Can't you just run each example individually and accumulate the gradients in memory and apply them
+                    when you get enough?
+                \item Given that I am giving a whole talk on why batching is hard shouldn't you try to avoid it?
             \end{itemize}
             \note{
                 \begin{itemize}
                     \item Gradient Accumulation is used when your networks are really large and can't fit on a single
                         GPU
+                    \item But we have a good reason to actually batch and that is...
                 \end{itemize}
             }
         \end{frame}
 
         \begin{frame}
             \frametitle{Speed}
-                Picture of a GPU
+            \begin{center}
+                \includegraphics[width=0.7\textwidth]{images/gpu.jpg}
+            \end{center}
             \note{
                 \begin{itemize}
-                    \item We showed before that we can express batched operations as matrix matrix multiplcations
-                    \item Lucky for use we are really go at doing these matmuls fast
-                    \item libraries and devices like GPUs are designed to do these is a parallel and fast way
-                    \item we can stand on the shoulders of gaming to train models really fast
+                    \item
+                        \href{https://hothardware.com/news/nvidia-graphics-card-shortage-to-continue-through-q3-2018}{Image
+                        from here}
+                    \item We showed before that we can express batched operations as matrix matrix multiplications
+                    \item Lucky for us humanity has gotten really good at doing these matmuls fast
+                    \item We have specialized libraries and even specialized devices like GPUs are designed to do these
+                        in a parallel and fast way
+                    \item We can stand on the shoulders of gaming to train models really fast
                 \end{itemize}
             }
         \end{frame}
@@ -856,17 +1112,45 @@
     \begin{frame}
         \frametitle{Batching in NLP}
 
-        A vector of one lengths and a vector of a different length and something that shows how they can't be a batch
+        \begin{itemize}
+            \item[]<1-> $$\begin{bmatrix} \text{The} & \text{dog} & \text{ran} & \text{very} & \text{fast} \end{bmatrix}
+            \item[]<2-> $$\begin{bmatrix} \text{The} & \text{cat} & \text{slept} \end{bmatrix}
+        \end{itemize}
 
         \note{
             \begin{itemize}
+                \item Now that we know batching is a good idea and you are all really jazzed up about it, I'm going to
+                    rain on your parade a bit.
+                \item The problem is that batching is pretty hard in NLP
                 \item We saw before that batching involves stacking multiple vectors of the same shape into a matrix
                 \item In NLP we often have examples that have different lengths
                 \begin{itemize}
                     \item Because sentences have different lengths
                     \item Because words have different number of characters in them
                 \end{itemize}
-                \item we can't just batch any given sentences
+                \item We can't just batch any given pair of sentences.
+            \end{itemize}
+        }
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Batching in NLP}
+
+        $$
+            \begin{bmatrix}
+                \text{The} & \text{dog} & \text{ran} & \text{very} & \text{fast} \\
+                \text{The} & \text{cat} & \text{slept} & &
+            \end{bmatrix}
+        $$
+        \includegraphics[width=\textwidth]{images/x.png}
+
+        \note{
+            \begin{itemize}
+                \item Here we can't batch these examples because they are different lengths, this would create a ragged
+                    array, we need it to be regular.
+                \item
+                    \href{https://www.kissclipart.com/big-red-x-transparent-background-clipart-desktop-w-3joifc/}{Image
+                    from here}
             \end{itemize}
         }
     \end{frame}
@@ -874,12 +1158,18 @@
     \begin{frame}
         \frametitle{Introducing \textless PAD\textgreater}
 
-        The same sentences as above but using pad to make them match
+        $$
+            \begin{bmatrix}
+                \text{The} & \text{dog} & \text{ran} & \text{very} & \text{fast} \\
+                \text{The} & \text{cat} & \text{slept} & \text{\textless PAD \textgreater} & \text{\textless PAD \textgreater}
+            \end{bmatrix}
+        $$
 
         \note{
             \begin{itemize}
-                \item We use a new symbol call \textless PAD\textgreater .
-                \item We add this to the end of shorter sentence so that all the ones in a batch have the sample length.
+                \item Now lets look at how we can handle batching things of different lengths.
+                \item We are going to use a new symbol call \textless PAD\textgreater .
+                \item We add this to the end of shorter sentence so that all the sentences in a batch have the sample length.
                 \item Now that they are all the same length we can turn them into a matrix.
             \end{itemize}
         }
@@ -888,17 +1178,28 @@
     \begin{frame}
         \frametitle{The lengths vector}
 
-        The same sentences as above but also show a vector of legnths for them
+        $$
+            \begin{bmatrix}
+                \text{The} & \text{dog} & \text{ran} & \text{very} & \text{fast} \\
+                \text{The} & \text{cat} & \text{slept} & \text{\textless PAD \textgreater} & \text{\textless PAD \textgreater}
+            \end{bmatrix}
+        $$
+        $$
+            L = \begin{bmatrix} 5 & 3 \end{bmatrix}
+        $$
 
         \note{
             \begin{itemize}
-                \item Now that some of our examples are longer because if this $<PAD>$ we need to track how long the
+                \item Now that some of our examples are longer because if this \textless PAD \textgreater we need to track how long the
                     actual data is
-                \item We store this in a vector
-                \item This will be a vector of the same length as items in the batch
+                \item We store this in a lengths vector
+                \item This will be a vector of the same length as the number of items in the batch
                 \item The value will be the number of non padded elements in that example
-                \item You can actually have padding on every example so the length of your time dimension is longer that
-                    the maximum value in the lengths vector but this is sloppy and we won't really consider that case.
+                \item You can actually have padding on every example in the batch.
+                \item This means the length of the physical batch is longer than the maximum value in the lengths vector
+                \item This is normally an artifact of being lazy with your data preprocessing, a bit sloppy, and can
+                    result in extra computation being done.
+                \item Because doing this is wasteful we won't really consider this situation.
             \end{itemize}
         }
     \end{frame}
@@ -907,8 +1208,21 @@
 
 \begin{section}{Batching can Introduce Errors}
 
-    % Something is weird with the slides in the frame here
     \begin{subsection}{Mean Pooling}
+        \begin{frame}
+            \frametitle{Mean Pooling}
+            \includegraphics[width=\textwidth]{images/mean-pooling.png}
+            \note{
+                \begin{itemize}
+                    \item As a warm up we are going to look at Mean Pooling.
+                    \item The main use-case of mean pooling is in the Neural Bag of Words model.
+                    \item We embed each word resulting in a matrix that is sentence length by embedding size
+                    \item We do a mean over each time, so each feature is mean-ed separately
+                    \item This results in a sentence vector that we can then use for classification
+                \end{itemize}
+            }
+        \end{frame}
+
         \begin{frame}
             \frametitle{Mean Pooling}
             \begin{itemize}
@@ -941,19 +1255,19 @@
             \end{itemize}
             \note{
                 \begin{itemize}
-                    \item How we will look at how padding can get us in trouble
-                    \item In most of these examples there is actually another dimension of features but we are going to
-                        ignore it for simplicity
-                    \item This is mean pooling can be used to aggregate over some dimension, for example we can pool the
-                        features across a sentence to get the representation for the whole sentence.
+                    \item Mean pooling gives us a clear example of how padding can get us in trouble
+                    \item Side Note: In most of these examples there is actually another dimension of features that
+                        these operations are actually acting on but we are going to ignore it and only really look at a
+                        single feature in this dimension for simplicity
                     \item Here we see the mean pooling for a vector of length 6
                     \item<2-> Here we see the mean pooling for a length of 4 (shorter)
                     \item<3-> How we see that in order to batch we need to pad the shorter vector
-                    \item<3-> Now our denominator is much larger so our results is smaller!
+                    \item<3-> Now our denominator is much larger so our result of mean-ing is smaller!
                     \item<3-> Before I said that batching allows us to combine unrelated examples and calculate them in
-                        one short but this illustrates the problems with padding,
-                    \item<3-> When you padding goes wrong your results for some example will bleed over and effect
-                        others which breaks the independence assumption we had before
+                        one short and get the same results as if you had calculated them independently
+                    \item<3-> When your padding goes wrong the results for an example will be dependent on the other
+                        things in the batch. When these padding cases information to bleed across examples this
+                        independence is broken and our calculations will be wrong.
                 \end{itemize}
             }
         \end{frame}
@@ -975,15 +1289,20 @@
 
     \note{
         \begin{itemize}
-            \item We can solve this by explicitly using the lengths vector we had before.
+            \item We can solve this by explicitly using the lengths vector.
             \item We can manually do our sum and then divide by the actual length instead of the length of the padded
                 vector
             \item This assumes that the padded value is zero. Soon we will see how to insure that.
             \item This sort of thing is important because if you don't do it then values will dependent on what else is
                 in the batch.
-            \item This problem is especially important in training vs production environments, when training it is
-                almost always in a batch with things that are longer but in prod you are often a single example where
-                you are the longest thing.
+            \item This problem is especially important in training vs production environments
+            \begin{itemize}
+                \item when training it an example is almost always in a batch
+                \item When you are in a batch is is relatively rare to be the longest so being correct in the presence
+                    of padding is important
+                \item In prod you are often a single example and you are by definition the longest thing in the batch
+                \item This means that you need to have the same results with and without padding
+            \end{itemize}
         \end{itemize}
     }
 
@@ -992,9 +1311,48 @@
     \end{subsection} % Mean Pooling
 
     \begin{subsection}{Token Level Losses}
+        \begin{frame}
+            \frametitle{Cross Entropy}
+
+            \[
+                L_{\text{cross-entropy}}(\hat{y}, y) = - \sum_i y_i \log (\hat{y}_i)
+            \]
+            \note{
+                \begin{itemize}
+                    \item Out next example of where padding can get up to no good is in our loss functions
+                    \item Our normal loss is the cross entropy loss between two vectors
+                    \item $y$ is the vector that has a our labels and $\hat{y}$ is out predicted labels
+                    \item cross entropy is a measure of the difference between two distributions
+                    \item The cross entropy is the sum of the true value times the log of the predicted values
+                    \item In classifiction where we output a probability distribution over classes we can use this loss
+                        function to train the model
+                \end{itemize}
+            }
+        \end{frame}
 
         \begin{frame}
-            \frametitle{(Sparse) Cross Entropy Loss}
+            \frametitle{Sparse Cross Entropy}
+
+            \[
+                L_{\text{cross-entropy}}(\hat{y}, y) = - \sum_i y_i \log (\hat{y}_i)
+            \]
+            \[
+                L_{\text{sparse-cross-entropy}}(\hat{y}, y) = - \log(\hat{y_i}[y])
+            \]
+            \note{
+                \begin{itemize}
+                    \item Because our labels are always a one hot vector (it only has a 1 at the location that represents
+                        the label index) most of these elements in this sum will be zero
+                    \item In fact the only value will be the probability for the predicted class
+                    \item We can short cut this calculation by just indexing the predicted vector with the true class
+                        index
+                    \item This is what we call sparse cross entropy
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}<1>
+            \frametitle{Token-Level (Sparse) Cross Entropy Loss}
             \begin{align*}
                 T &\coloneqq \text{length of example} \\
                 V &\coloneqq \text{number of possible labels} \\
@@ -1005,13 +1363,13 @@
 
             \note{
                 \begin{itemize}
-                    \item The next example is in the idea of a token level loss. This is a loss where a loss is computed
-                        at each step in a vector.
+                    \item This idea of sparse cross entropy can be extend to the idea of a token level loss.
+                    \item This means that a decision is made for every token and we calculate the loss for the
+                        probability vector that is output for each token in a sentence.
+                    \item We will see soon how this loss at the padding positions can mess us up.
                     \item Here we see the cross entropy loss where we have a matrix of scores. Each row represents the
-                        scores of a token and each column is the score for some tag
-                    \item This is sparse cross entropy where each token only has one label so we can select out the
-                        score for the right class instead of scaling the score with the value on the label
-                    \item Our loss is then the score sum of the score for each token,
+                        scores of a token and each column is the score for some class.
+                    \item Our loss is then the sum (or mean) of the score for each token.
                     \item This kind of loss is often used for language modeling where the label is the index of the next
                         word or else sequence tagging where the label is the tokens tag.
                 \end{itemize}
@@ -1061,11 +1419,11 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Here we see what can happen when you are batching the shorter sentence. When you are
-                        selecting the scores for the padding tokens they really could be anything
+                    \item Here we see what can happen when you are batching and have a shorter sentence.
+                    \item When you are selecting the scores for the padding tokens they really could be anything
                     \item We don't really want the network to have to learn to output a padding symbol after the normal
-                        length, that isn't a situation you would really have
-                    \item We also don't want random lucky values to make our loss really small
+                        length, that isn't a situation you would really have a use for.
+                    \item We also don't want random lucky values to make our loss look really good.
                     \item We need a way to zero our the effects of these padded locations
                 \end{itemize}
             }
@@ -1081,16 +1439,19 @@
         >>> mask = (np.reshape(lengths, (-1, 1)) > steps).astype(np.int32)
         >>> mask
         array([[1, 1, 1, 1, 1],
-               [1, 1, 0, 0, 0],
+               [1, 1, 1, 0, 0],
                [1, 1, 1, 1, 0]], dtype=int32)
     \end{pythoncode}
     \note{
         \begin{itemize}
-            \item Here we see how to create a mask. This mask has ones where the valid tokens are and a zero where the
-                padding tokens are.
+            \item We will zero out these values by using a mask
+            \item This mask has ones where the valid tokens are and a zero where the padding tokens are.
+            \item Here we see how to create a mask.
             \item We create this with broadcasting.
-            \item We create a vector of incrementing steps along the sentence dimension and compare them to the lengths.
+            \item We create a vector of incrementing steps along the dimension that includes padding and compare them to
+                the lengths vector.
             \item When the length is longer than the current steps we are still valid so the value is one.
+            \item Once the step is longer than the length we are in the pad and will output zeros.
         \end{itemize}
     }
 \end{frame}
@@ -1117,6 +1478,7 @@
                     \item We can then sum the values (or mean them with the lengths if you want).
                     \item Some toolkits like Pytorch can handle this for you, you give a value to the
                         \texttt{padding\_idx} parameter and it will ignore values where the label is that padding index
+                    \item Toolkits like tensorflow will probably make you do this our self.
                 \end{itemize}
             }
         \end{frame}
@@ -1127,12 +1489,39 @@
 
         \begin{frame}
             \frametitle{Attention}
-
-            Picture of seq2seq attention and transformer self attention here
-
-            \note{
+            \includegraphics[width=\textwidth]{images/attention.jpg}
+            \note[size=\tiny]{
                 \begin{itemize}
                     \item Attention is used to contextualize a vector relative to others.
+                    \item We have some vector here in the decoder and want to create a new vector that summarizes the
+                        information in these vectors created by the encoder that is relevant to decoder vector.
+                    \item We do this by creating a similarity score between the vector we care about and each vector in
+                        the memory bank of vectors
+                    \item We then normalize these values and create new vector by taking a weight average of the memory
+                        bank
+                    \item This is often used in seq2seq models to short cut information from the encoder into the
+                        decoder
+                    \item \href{https://www.tensorflow.org/tutorials/text/nmt_with_attention}{Image From Here}
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Attention}
+            \includegraphics[width=\textwidth]{images/attention.jpg}
+            \note[size=\tiny]{
+                \begin{itemize}
+                    \item In a more general format we have 3 sets of vectors
+                    \begin{itemize}
+                        \item Query Vectors: the ones we are processing right now
+                        \item Key Vectors: The ones we are doing the similarity score with
+                        \item Value Vectors: The ones that are actually mixed together
+                    \end{itemize}
+                    \item In some cases these vectors can be the same (for example RNN Seq2seq normally use $K = Q$) in
+                        other case they are either different or the same thing projected into different spaces
+                    \item The point of this is that the representation of a vector that is useful down stream might not
+                        be one that is similar to the query vectors so the keys can be the similar ones.
+                    \item \href{https://www.tensorflow.org/tutorials/text/nmt_with_attention}{Image From Here}
                 \end{itemize}
             }
         \end{frame}
@@ -1142,16 +1531,14 @@
 
             \begin{align*}
                 q &= \begin{bmatrix}
-                        \vert \\
-                        q_1\\
-                        \vert
+                    \text{---} & q & \text{---}
                     \end{bmatrix} \\
-                V &= \begin{bmatrix}
+                K &= \begin{bmatrix}
                          \vert & \vert & & \vert \\
-                         v_1 & v_2 & \cdots & v_n \\
+                         k_1 & k_2 & \cdots & k_n \\
                          \vert & \vert & & \vert
                      \end{bmatrix} \\
-                s &= \similar(q, V) = \begin{bmatrix}
+                s &= \similar(q, K) = \begin{bmatrix}
                         s_1 & s_2 & \cdots & s_n \\
                     \end{bmatrix}
             \end{align*}
@@ -1159,6 +1546,15 @@
             \note{
                 \begin{itemize}
                     \item First we calculate a score between the vectors
+                    \item There are multiple ways to calculate these similarities, the original paper used a small
+                        neural network, later architectures (notably the transformer) use the dot product to calculate
+                        the score.
+                    \item The transformer actually uses the scaled dot product where it divides the score by $\sqrt{d_k}$
+                        because the dot product will get larger as the vectors get larger
+                    \item In this case we are just using a single vector for $q$ but we can actually use a matrix $Q$ to
+                        calculate the attention between multiple vectors at once.
+                    \item This vector version is common for RNN seq2seq models (where you have single vector at each timestep)
+                    \item The Matrix version is used in the transformer where we want to do attention for the whole sentence at once
                 \end{itemize}
             }
         \end{frame}
@@ -1166,7 +1562,7 @@
         \begin{frame}
             \frametitle{Attention}
             \begin{align*}
-                s &= \similar(q, V) = \begin{bmatrix}
+                s &= \similar(q, K) = \begin{bmatrix}
                         0.21 & -0.34 & \cdots & 0.55 \\
                     \end{bmatrix} \\
                 \softmax(x) &= \frac{e^{x_i}}{\sum_j e^{x_j}} \\
@@ -1174,9 +1570,15 @@
                         0.1684 & 0.0977 & \cdots & 0.2379 \\
                     \end{bmatrix} \\
             \end{align*}
+
+            \href{https://blester125.com/blog/softamx.html}{Numerically stable softmax blog post.}
             \note{
                 \begin{itemize}
-                    \item Then we use the softmax so they sum to one and we can do a weighted average
+                    \item Then we use the softmax so the score are all positive and they sum to one.
+                    \item The softmax is the done by exponentiating each element and then normalizing the elements.
+                    \item I have a blog post about how you can do that in a numerically stable way if you decide to roll
+                        your own implementation.
+                    \item We can then uses these scores to do a weight average.
                 \end{itemize}
             }
         \end{frame}
@@ -1189,17 +1591,17 @@
                          v_1 & v_2 & \cdots & v_n \\
                          \vert & \vert & & \vert
                      \end{bmatrix} \\
-                s &= \similar(q, V) = \begin{bmatrix}
+                s &= \similar(q, K) = \begin{bmatrix}
                         s_1 & s_2 & \cdots & s_n \\
                     \end{bmatrix} \\
                 \alpha &= \softmax(s) \\
-                v &= V * \alpha^{T} \\
+                c &= V * \alpha^{T} \\
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Then we do a weighted average of the vectors based on these calculated scores
-                    \item Now $v$ is a combination of the vectors in $V$ weighted by their attention scores which were
-                        calculated based on their similarity to q
+                    \item Then we do a weighted average of the value vectors based on these calculated (and normalized) scores.
+                    \item Now $c$ is a combination of the vectors in $V$ weighted by their attention scores which were
+                        calculated based on the similarity of the query vectors to $q$
                 \end{itemize}
             }
         \end{frame}
@@ -1208,9 +1610,9 @@
             \frametitle{Attention}
 
             \begin{align*}
-                V &= \begin{bmatrix}
+                K &= \begin{bmatrix}
                         \vert & \vert & & \vert & \vert \\
-                        v_1 & v_2 & \cdots & \text{\textless PAD\textgreater} & \text{\textless PAD \textgreater} \\
+                        k_1 & k_2 & \cdots & \text{\textless PAD\textgreater} & \text{\textless PAD \textgreater} \\
                         \vert & \vert & & \vert & \vert \\
                      \end{bmatrix} \\
                 s &= \begin{bmatrix}
@@ -1221,9 +1623,9 @@
             \note{
                 \begin{itemize}
                     \item But what happens when we calculate the similarity between vectors that have padding on them?
-                    \item With most similarity metrics (dot/scaled dot product) we get zeros for the similarity between
-                        a pad and a vector (assuming the pad is zeros)
-                    \item Is this enough to calculate the right thing?
+                    \item With most similarity metrics (dot/scaled dot product) we do get zeros for the similarity between
+                        a padding vector and a valid vector (assuming the pad is zeros)
+                    \item Is this enough so that our calculations will be correct?
                     \item Would I have brought this up if it was?
                 \end{itemize}
             }
@@ -1246,9 +1648,10 @@
     \note{
         \begin{itemize}
             \item Here we can see that when the scores going into the softmax are zero we will get non-zero scores out!
-            \item This means that when we do the mixing with the weighted average we will 
-            \item What we need to have there be zeros \textbf{After} the softmax which will zero out the contribution of
-                the padding
+            \item This means that when we do the mixing of the value vectors were are going to include the padding
+                vectors in our weighted average.
+            \item What we need to have there be zeros \textbf{after} the softmax which will zero out the contribution of
+                the padding.
         \end{itemize}
     }
 \end{frame}
@@ -1271,12 +1674,13 @@
     \end{pythoncode}
     \note{
         \begin{itemize}
-            \item Ok, lets just mask out those padding weights, now their values are zero so they won't contribute to
-                the weighted average anymore.
-            \item But we see that the values don't sum to one any more!
-            \item This solution isn't enough
-            \item We all see that the values calculated for the sorter batch are very different then when calculated by
-                itself. Remember the whole point of batching is that we should be able to run multiple examples at once
+            \item Ok, our first cut is just masking out those padding weights, now their values are zero so they won't 
+                contribute to the weighted average anymore.
+            \item Is this ok?
+            \item We can see that the values for this example don't sum to one any more, this solution isn't enough
+            \item We we can also see that the values calculated for the sorter batch are very different then when that
+                example is calculated by itself.
+            \item Remember the whole point of batching is that we should be able to run multiple examples at once
                 and get the same values as if we ran them through one at a time
         \end{itemize}
     }
@@ -1295,15 +1699,15 @@
          [0.50917835, 0.3772086 , 0.11361305, 0.        , 0.        ]])
   >>> softmax(x[1:np.newaxis, 0:3])
   >>> array([[0.50917835, 0.3772086 , 0.11361305]])
-  >>> softmax(masked_x)sum(axis=1)
+  >>> softmax(masked_x).sum(axis=1)
   array([1., 1.])
     \end{pythoncode}
-    \note{
+    \note[size=\tiny]{
         \begin{itemize}
             \item We need to hack softmax to force it to output zeros for the padded values while the other values sum
                 to one.
-            \item We know that the softmax will exponentiate each element and we know that any element to a negative
-                number of will approach zero as the exponent grows
+            \item We know that the softmax will exponentiate each element and we know that exponentiation by a negative
+                number of will approach zero as the exponent grows.
             \item With a sufficiently negative number we can force an element to zero
             \item On this first line \texttt{(1 - mask)} will flip a mask of ones and zeros.
             \begin{itemize}
@@ -1311,7 +1715,8 @@
                 \item This will mean that the ones are now where the pads and zero where the valid elements are
             \end{itemize}
             \item Then we multiply in a very negative number so out mask is all zeros and this neg
-            \item We multiply by the mask to make sure the padding locations are zero then we add the inverse mask in
+            \item We multiply by the mask to make sure the padding locations are zero (not strictly necessary) then we
+                add the inverse mask in.
             \item the inverse mask has all zeros for the valid elements so they don't change but it has $-1e^9$ for the
                 pad so zero + that negative is that negative
             \item Now when we do the softmax we see that out values match and they sum to one in each axis
@@ -1322,17 +1727,23 @@
         \begin{frame}
             \frametitle{Attention}
 
-            A self attention picture here?
+            \includegraphics[width=\textwidth]{images/self-attention.png}
 
             \note{
                 \begin{itemize}
-                    \item Masking in attention is also used in transformers to enforce casuality
-                    \item The mask stops the attention from looking forward in time
-                    \item This mask works the exact same way
-                    \item Sometimes you need to combine this causal mask and a length mask to make sure you aren't looking
-                        at tokens that don't exist
-                    \item Attention is an example where just masking out the value isn't enough, we actually have to
+                    \item We have been looking at encoder-decoder attention where we compare a vector in the decoder to
+                        the values in the encoder.
+                    \item There is also self attention were we compare to all the tokens around us.
+                    \item There is also a special case of self attention where we can use a mask to enforce causality
+                    \item This mask would stop the attention from looking forward in time at words that haven't been
+                        generated yet.
+                    \item This mask works the same way as the length mask.
+                    \item Some times you need to combine these masks.
+                    \item Attention is an example where just masking out the padding value isn't enough, we actually have to
                         manipulate the padding values in a specific way.
+                    \item
+                        \href{https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1184/lectures/lecture12.pdf}{Image
+                        is from here}
                 \end{itemize}
             }
         \end{frame}
@@ -1340,6 +1751,77 @@
     \end{subsection} % Attention
 
     \begin{subsection}{Conditional Random Field}
+
+        \begin{frame}
+            \frametitle{Conditional Random Field}
+
+            \begin{center}
+                \includegraphics[width=0.6\textwidth]{images/crf.png}
+            \end{center}
+            $$
+                P(\hat{y}|x;\theta) = \frac{\exp(\sum_i \sum_j w_j f_j(\hat{y}_{i-1}, \hat{y}_i, x, i))}{\sum_{y' \in Y}\exp(\sum_i
+                \sum_j w_j f_j(y'_{i - 1}, y'_i, x i))}
+            $$
+            \begin{center}
+                \href{https://createmomo.github.io/2017/09/12/CRF_Layer_on_the_Top_of_BiLSTM_1/}{Great Tutorial on CRFs}
+            \end{center}
+
+            \note{
+                \begin{itemize}
+                    \item This is our most complex example
+                    \item
+                        \href{https://www.researchgate.net/figure/Linear-chain-conditional-random-fields-model-Black-nodes-represent-observable-values_fig20_263324470}{Image
+                        from Here}
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Conditional Random Field}
+            \begin{align*}
+                t &\coloneqq \text{number of tokens} \\
+                c &\coloneqq \text{number of classes} \\
+                \alpha &\in \R^S \\
+                e &\in \R^{t \text{ x } c} \\
+                t &\in \R^{c \text{ x } c} \\
+                \forall_{i \in t} \hspace{2pt} \alpha_i &= \logsumexp(\alpha_{i - 1} + e_i^T + t) \\
+            \end{align*}
+
+        \end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Conditional Random Field}
+    \begin{pythoncode}
+>>> lengths = np.array([3, 1, 5])
+>>> lengths
+array([3, 1, 5])
+>>> for i in range(np.max(lengths)):
+...     new_alphas = calculate_step(alpha, emission, transistion)
+...     mask = (i < lengths).astype(np.uint8)
+...     print(mask)
+...     alphas = (alpha * mask) + (new_alphas * (1 - mask))
+[1 1 1]
+[1 0 1]
+[1 0 1]
+[0 0 1]
+[0 0 1]
+    \end{pythoncode}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Conditional Random Field}
+    \begin{pythoncode}
+        >>> a
+        array([1, 2, 3, 4, 5])
+        >>> b
+        array([-1, -2, -3, -4, -5])
+        >>> mask = np.where(a >= 4, 1, 0)
+        >>> mask
+        array([0, 0, 0, 1, 1])
+        >>> (a * mask) + (b * (1 - mask))
+        array([-1, -2, -3,  4,  5])
+    \end{pythoncode}
+\end{frame}
 
         \begin{frame}
             \frametitle{CRF}
@@ -1366,6 +1848,24 @@
 
         \begin{frame}
             \frametitle{Max Pooling}
+            \includegraphics[width=\textwidth]{images/mot-pooling.png}
+            \note{
+                \begin{itemize}
+                    \item Max pooling is often applied across a feature dimension in the same way that mean pooling is
+                    \item Here we see a set of vectors, each one is a featured representation of a word in a sentence
+                    \item We do max pooling across a single feature dimension.
+                    \item We end up with a single vector where each feature is the largest value that feature took in
+                        the course of the sentence
+                    \item We can also do this at a word level where each vector represents a character in a word
+                    \item A common use case is to encode words with a Convolutional Network (which we will get to soon)
+                        and then aggregate the results with max pooling.
+                    \item \href{https://jessicastringham.net/2018/12/30/conv-max-pool/}{Image from here}
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Max Pooling}
             \begin{align*}
                 x &= \begin{bmatrix}
                     1 & 0 & 4 & 3 & 2 & 0 & 0
@@ -1375,10 +1875,12 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item Pop Quiz: Here we have a vector, it has a length of 5 meaning the last two zeros are padding
-                    \item Lets say this vector just went through a ReLU $\max(0, x)$ so it will never have a negative
-                        number
-                    \item Is it save to do a max without thinking about padding?
+                    \item Here we are zoomed in a single feature over time, these are the numbers in the blue
+                        highlighted area on the last slide
+                    \item Lets say these vectors we are zoomed in one just went through a ReLU $\max(0, x)$ so it will
+                        never have a negative number in it.
+                    \item This example has a length of 5 which means the last two zero features are padding
+                    \item Pop Quiz: Is it safe to do a max without thinking about padding?
                     \item \textbf{YES}
                 \end{itemize}
             }
@@ -1397,13 +1899,11 @@
             \note{
                 \begin{itemize}
                     \item What about a vector that looks like this?
-                    \item Max Pooling is often applied along a feature dimension when you have multiple words to select
-                        the highest value that feature takes on in any word
-                    \item Lets say here we are looking at a feature of a word right after embedding
-                    \item Your max pooling it going to output zero for each these!
+                    \item Lets say here we are looking at a feature of a word right after embedding.
+                    \item Your max pooling it going to output zero for this feature!
                     \item Your network will never see a negative value for most examples while training! (most examples
                         are padded)
-                    \item Your network will see these values at test time and have no idea what to do!
+                    \item Your network will see these negative values at test time and have no idea what to do!
                     \item How do we fix this?
                 \end{itemize}
             }
@@ -1442,8 +1942,8 @@
             \end{align*}
             \note{
                 \begin{itemize}
-                    \item This same thing applies in Min pooling but we where the padding can be selected as the minimum
-                        even if it isn't. We can solve this similarly but set the padding to a very high value.
+                    \item This same thing applies in Min pooling, we where the padding can be selected as the minimum.
+                    \item We can solve this similarly but set the padding to a very high value.
                 \end{itemize}
             }
         \end{frame}
@@ -1454,15 +1954,23 @@
 
         \begin{frame}
             \frametitle{Convolution 1D}
-            GIF of a convolution here?
+            \begin{center}
+                \includegraphics[height=0.8\textheight]{images/conv.jpg}
+            \end{center}
 
             \note{
                 \begin{itemize}
-                    \item Convolutions are used to process basically soft n-grams
-                    \item This is commonly used in text classification, the conv will look at multiple words at a time.
-                        To create a new representation that is the word contextualized by the words around it
+                    \item Convolutions are basically used to process soft n-grams.
+                    \item This is commonly used in text classification
+                    \item The conv will look at multiple words at a time, and create a new representation of the word
+                        contextualized by the words around it.
+                    \item Once we have contextualized the representation we will aggregate into a single vector with
+                        some sort of pooling.
                     \item It is also common in taggers to use a convolution to create a representation of a word based
                         on the characters.
+                    \item
+                        \href{http://www.joshuakim.io/understanding-how-convolutional-neural-network-cnn-perform-text-classification-with-word-embeddings/}{Image
+                        from here}
                 \end{itemize}
             }
 
@@ -1471,12 +1979,26 @@
         \begin{frame}
             \frametitle{Convolution 1D}
 
-            Diagram of non padded conv creating a shorter vector across multiple slides
+            $$
+                w = \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & \tikzmark{left}{4} & 5 & \tikzmark{right}{6} & 7 & 8 &
+                \end{array} \right] \\
+                \Highlight[first]
+            $$
+            $$
+                \left[ \begin{array}{*5{c}}
+                    & \tikzmark{left}{32}\tikzmark{right}{} & 38 & 44
+                \end{array} \right]
+                \Highlight[second]
+            $$
 
             \note{
                 \begin{itemize}
                     \item So this shows us how a convolution works, we look at a window, scale the values by a learned
-                        weight matrix (not shown here) and sum them to create a new value for this position.
+                        weight matrix and sum them to create a new value for this position.
                     \item Unfortunately here we can see that a convolution will actually create a new, shorter sentence
                     \item We need to introduce a new form of padding that I will call conv-padding to distinguish from
                         the padding we have been talking about before
@@ -1487,13 +2009,29 @@
         \begin{frame}
             \frametitle{Convolution 1D}
 
-            Diagram of padded conv creating a sequence of the same length
+            $$
+                w = \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & 4 & \tikzmark{left}{5} & 6 & \tikzmark{right}{7} & 8 &
+                \end{array} \right] \\
+                \Highlight[first]
+            $$
+            $$
+                \left[ \begin{array}{*5{c}}
+                    & 32 & \tikzmark{left}{38}\tikzmark{right}{} & 44
+                \end{array} \right]
+                \Highlight[second]
+            $$
 
             \note{
                 \begin{itemize}
-                    \item Here we can see we are adding a padding of zeros on each side
-                    \item There are filtersz // 2 units on each side
-                    \item We see here how we now get a vector that is the same length as the input (before padding)
+                    \item So this shows us how a convolution works, we look at a window, scale the values by a learned
+                        weight matrix and sum them to create a new value for this position.
+                    \item Unfortunately here we can see that a convolution will actually create a new, shorter sentence
+                    \item We need to introduce a new form of padding that I will call conv-padding to distinguish from
+                        the padding we have been talking about before
                 \end{itemize}
             }
         \end{frame}
@@ -1501,7 +2039,268 @@
         \begin{frame}
             \frametitle{Convolution 1D}
 
-            Diagram of padded conv where there is extra padding
+            $$
+                w = \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & 4 & 5 & \tikzmark{left}{6} & 7 & \tikzmark{right}{8} &
+                \end{array} \right] \\
+                \Highlight[first]
+            $$
+            $$
+                \left[ \begin{array}{*5{c}}
+                    & 32 & 38 & \tikzmark{left}{44}\tikzmark{right}{} &
+                \end{array} \right]
+                \Highlight[second]
+            $$
+
+            \note{
+                \begin{itemize}
+                    \item So this shows us how a convolution works, we look at a window, scale the values by a learned
+                        weight matrix and sum them to create a new value for this position.
+                    \item Unfortunately here we can see that a convolution will actually create a new, shorter sentence
+                    \item We need to introduce a new form of padding that I will call conv-padding to distinguish from
+                        the padding we have been talking about before
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Padded Convolution 1D}
+
+            $$
+                w = \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+            $$
+            $$
+                \left[ \begin{array}{*9{c}}
+                    & \tikzmark{left}{0} & 4 &  \tikzmark{right}{5} & 6 & 7 & 8 & 0 &
+                \end{array} \right] \\
+                \Highlight[first]
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & \tikzmark{left}{23}\tikzmark{right}{} & 32 & 38 & 44 & 23 &
+                \end{array} \right]
+                \Highlight[second]
+            $$
+
+            \note{
+                \begin{itemize}
+                    \item Here we can see how conv-padding can be used to stop the sequence from getting shorter
+                    \item Here we can see we are adding a padding of zeros on each side
+                    \item There are filtersz // 2 units on each side
+                    \item Another advantage of this conv-padding is that without padding there is on;y a single
+                        calculation that involves the first word. conv-padding makes it so that there is more
+                        information from the tokens on each end.
+                    \item We see here how we now get a vector that is the same length as the input (before padding)
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Padded Convolution 1D}
+
+            $$
+                w = \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+            $$
+            $$
+                \left[ \begin{array}{*9{c}}
+                    & 0 & \tikzmark{left}{4} & 5 & \tikzmark{right}{6} & 7 & 8 & 0 &
+                \end{array} \right] \\
+                \Highlight[first]
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & 23 & \tikzmark{left}{32}\tikzmark{right}{} & 38 & 44 & 23 &
+                \end{array} \right]
+                \Highlight[second]
+            $$
+
+            \note{
+                \begin{itemize}
+                    \item Here we can see how conv-padding can be used to stop the sequence from getting shorter
+                    \item Here we can see we are adding a padding of zeros on each side
+                    \item There are filtersz // 2 units on each side
+                    \item Another advantage of this conv-padding is that without padding there is on;y a single
+                        calculation that involves the first word. conv-padding makes it so that there is more
+                        information from the tokens on each end.
+                    \item We see here how we now get a vector that is the same length as the input (before padding)
+                \end{itemize}
+            }
+        \end{frame}
+
+
+        \begin{frame}
+            \frametitle{Padded Convolution 1D}
+
+            $$
+                w = \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+            $$
+            $$
+                \left[ \begin{array}{*9{c}}
+                    & 0 & 4 & \tikzmark{left}{5} & 6 &  \tikzmark{right}{7} & 8 & 0 &
+                \end{array} \right] \\
+                \Highlight[first]
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & 23 & 32 & \tikzmark{left}{38}\tikzmark{right}{} & 44 & 23 &
+                \end{array} \right]
+                \Highlight[second]
+            $$
+
+            \note{
+                \begin{itemize}
+                    \item Here we can see how conv-padding can be used to stop the sequence from getting shorter
+                    \item Here we can see we are adding a padding of zeros on each side
+                    \item There are filtersz // 2 units on each side
+                    \item Another advantage of this conv-padding is that without padding there is on;y a single
+                        calculation that involves the first word. conv-padding makes it so that there is more
+                        information from the tokens on each end.
+                    \item We see here how we now get a vector that is the same length as the input (before padding)
+                \end{itemize}
+            }
+        \end{frame}
+
+
+        \begin{frame}
+            \frametitle{Padded Convolution 1D}
+
+            $$
+                w = \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+            $$
+            $$
+                \left[ \begin{array}{*9{c}}
+                    & 0 & 4 & 5 & \tikzmark{left}{6} & 7 &  \tikzmark{right}{8} & 0 &
+                \end{array} \right] \\
+                \Highlight[first]
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & 23 & 32 & 38 & \tikzmark{left}{44}\tikzmark{right}{} & 23 &
+                \end{array} \right]
+                \Highlight[second]
+            $$
+
+            \note{
+                \begin{itemize}
+                    \item Here we can see how conv-padding can be used to stop the sequence from getting shorter
+                    \item Here we can see we are adding a padding of zeros on each side
+                    \item There are filtersz // 2 units on each side
+                    \item Another advantage of this conv-padding is that without padding there is on;y a single
+                        calculation that involves the first word. conv-padding makes it so that there is more
+                        information from the tokens on each end.
+                    \item We see here how we now get a vector that is the same length as the input (before padding)
+                \end{itemize}
+            }
+        \end{frame}
+
+
+        \begin{frame}
+            \frametitle{Padded Convolution 1D}
+
+            $$
+                w = \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+            $$
+            $$
+                \left[ \begin{array}{*9{c}}
+                    & 0 & 4 & 5 & 6 & \tikzmark{left}{7} & 8 &  \tikzmark{right}{0} &
+                \end{array} \right] \\
+                \Highlight[first]
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & 23 & 32 & 38 & 44 & \tikzmark{left}{23}\tikzmark{right}{} &
+                \end{array} \right]
+                \Highlight[second]
+            $$
+
+            \note{
+                \begin{itemize}
+                    \item Here we can see how conv-padding can be used to stop the sequence from getting shorter
+                    \item Here we can see we are adding a padding of zeros on each side
+                    \item There are filtersz // 2 units on each side
+                    \item Another advantage of this conv-padding is that without padding there is on;y a single
+                        calculation that involves the first word. conv-padding makes it so that there is more
+                        information from the tokens on each end.
+                    \item We see here how we now get a vector that is the same length as the input (before padding)
+                \end{itemize}
+            }
+        \end{frame}
+
+
+        \begin{frame}
+            \frametitle{Batched Convolution 1D}
+
+            $$
+                w = \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & 6 & \tikzmark{right}{14} & 7 & 0 & 0 &
+                \end{array} \right] \\
+            $$
+            $$
+                \left[ \begin{array}{*9{c}}
+                    & \tikzmark{left}{0} & 6 & \tikzmark{right}{14} & 7 & 0 & 0 & 0 &
+                \end{array} \right] \\
+                \Highlight[first]
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & \tikzmark{left}{54}\tikzmark{right}{} & 55 & 28 & 7 & 0 &
+                \end{array} \right]
+                \Highlight[second]
+            $$
+
+            \note{
+                \begin{itemize}
+                    \item In this example we are zoomed in on an example that has already been padded, the two zeros at
+                        the end
+                    \item Now were are going to pad it again because the conv-padding is applied to the whole batch at
+                        once
+                    \item As we slide the conv we can see that at the end we have spots where the only part of the
+                        window is on the valid tokens but it is writing into the padding section of the output vector.
+                    \item This is introducing a new value what could be selected by the max pool during training time
+                        that would never happen at test time.
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Batched Convolution 1D}
+
+            $$
+                w = \begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+            $$
+            When we were already padded our convolution will bleed into the padding
+            $$
+                \left[ \begin{array}{*9{c}}
+                    & 0 & 6 & 14 & \tikzmark{left}{7} & 0 & \tikzmark{right}{0} &
+                \end{array} \right] \\
+                \Highlight[first]
+            $$
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & 54 & 55 & 28 & \tikzmark{left}{7}\tikzmark{right}{} & 0 &
+                \end{array} \right]
+                \Highlight[second]
+            $$
+
+            When we do this convolution by itself
+            $$
+                \left[ \begin{array}{*7{c}}
+                    & 0 & 6 & \tikzmark{left}{14} & 7 & \tikzmark{right}{0} &
+                \end{array} \right] \\
+                \Highlight[third]
+            $$
+            $$
+                \left[ \begin{array}{*5{c}}
+                    & 54 & 55 & \tikzmark{left}{28}\tikzmark{right}{} &
+                \end{array} \right]
+                \Highlight[fourth]
+            $$
 
             \note{
                 \begin{itemize}
@@ -1513,9 +2312,30 @@
                         window is on the valid tokens but it is writing into the output vector.
                     \item This is introducing a new value what could be selected by the max pool during training time
                         that would never happen at test time.
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Batched Convolution 1D}
+            These Convolutions are commonly used for:
+            \begin{itemize}
+                \item Encoding word n-grams which are then max pooled to create sentence representations for text
+                    classification
+                \item Encoding character n-grams and max pooling to create word representations. These ``char
+                    compositional'' features are common for sequence tagging
+                \item Creating a windowed context for tagging
+            \end{itemize}
+
+            \note{
+                \begin{itemize}
                     \item Does this matter? Yes, when I first noticed this but I trained a tagger on `Conll 2003` and
                         the first thing I trained have slightly different results based on if it was run on a single
                         example of batches so it seems very prevalent.
+                    \item Elmo has this batch instability bug but given their cavalier attitude to the RNN hidden states
+                        I think the engineering in Elmo is pretty from the hip so they probably don't care
+                    \item For the last use case I don't think we really need to care, padding in a later stage (CRF or
+                        the token level loss) should save us.
                     \item "But how do I fix this one Brian?" This is one is pretty easy you just need to zero out the
                         padded values after they go through the conv. If you are following it with maxpool you might
                         want to just jumpr right to masking the pad values with a very negative number
@@ -1533,8 +2353,8 @@
     \frametitle{Unit Tests}
     \begin{pythoncode}
 def test_batch_stability():
-    ex1 = generate_example()
-    ext = generate_example()
+    ex1 = generate_example(length=random.randint(5, 10))
+    ex2 = generate_example(length=random.randint(10, 15))
     res1 = network(ex1, lengths=[len(res1)])
     res2 = network(ex2, lengths=[len(res2)])
     batch, lengths = batch_examples(ex1, ex2)
@@ -1568,14 +2388,19 @@ def test_batch_stability():
     \frametitle{Conclusion}
     \begin{itemize}
         \item Almost nothing is a safe when you are padding.
-        \item You should be passing lengths around for most things
-        \item Some frameworks help manage this and you should so them when you can.
-        \item These bugs are hard to found so you should be writing unittests designed to find them.
+        \item You should be passing lengths around for most things.
+        \item Some frameworks help manage padding and you should use them when you can.
+        \item These bugs are hard to find so you should be writing unittests designed to check for them.
     \end{itemize}
     \note{
         \begin{itemize}
-            \item as mentioned pytorch loss lets you handle token level losses easy
-            \item Most RNN implementations take a length parameter and handle this for you
+            \item As mentioned pytorch losses can handle this for you with the \texttt{padding\_idx} parameter.
+            \item Most RNN implementations take a length parameter and handle this for you.
+            \item DyNet has an autobatching feature where they basically have a computation graph compiler.
+            \begin{itemize}
+                \item You can write forward passes that are not batched and the compiler will batch them on the fly.
+                \item Unfortunately DyNet isn't very active these days.
+            \end{itemize}
         \end{itemize}
     }
 \end{frame}
@@ -1583,12 +2408,20 @@ def test_batch_stability():
 \begin{frame}
     \frametitle{Contact}
     \begin{itemize}
-        \item \href{}{slides}
-        \item \href{}{twitter}
-        \item \href{}{github}
+        \item \href{https://github.com/blester125/A2D-NLP-Talk-Feb-27-2020}{Slides}
+        \item \href{https://twitter.com/blester125}{Twitter}
+        \item \href{https://github.com/blester125}{Github}
+        \item \href{https://github.com/dpressel/mead-baseline}{Mead-Baseline}
     \end{itemize}
     \note{
-        Thank you, any questions?
+        \begin{itemize}
+            \item Here is a link to these slides and the latex to make them.
+            \item This is my twitter, feel free to talk to me about batching or any NLP stuff.
+            \item This is my github which has a lot of (i think) cool NLP stuff on it
+            \item And this is a link to Mead-Baseline, we currently have a lot of layers that don't have these batch
+                stability tests. So if this talked interested you and you want to try your hand at it make a PR maybe?
+            \item Thank you, any questions?
+        \end{itemize}
     }
 \end{frame}
 
