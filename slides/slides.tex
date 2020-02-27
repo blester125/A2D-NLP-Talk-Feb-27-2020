@@ -8,6 +8,7 @@
 \usepackage{mathtools}
 \usepackage{minted}
 \usepackage{hyperref}
+\usepackage[ruled]{algorithm2e}
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
@@ -58,6 +59,22 @@
         \begin{center}
             \includegraphics[height=0.8\textheight]{images/qr.png}
         \end{center}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Cats}
+        \begin{center}
+            \includegraphics[height=0.8\textheight]{images/cat-qr.png}
+        \end{center}
+        \note{
+            \begin{itemize}
+                \item This QR code as a link to a compilation video of cats getting scared by cucumbers
+                \item In case you want to watch this instead of paying attention to the talk
+                \item Side Note: I have heard that this is very upsetting to the cats so I wouldn't recommend doing this
+                    to your cat but given that these people already filmed it I don't think it is \textit{that} bad to
+                    have a laugh at it.
+            \end{itemize}
+        }
     \end{frame}
 
     \begin{frame}
@@ -1169,7 +1186,7 @@
         $$
             \begin{bmatrix}
                 \text{The} & \text{dog} & \text{ran} & \text{very} & \text{fast} \\
-                \text{The} & \text{cat} & \text{slept} & \text{\textless PAD \textgreater} & \text{\textless PAD \textgreater}
+                \text{The} & \text{cat} & \text{slept} & \text{\textless PAD\textgreater} & \text{\textless PAD\textgreater}
             \end{bmatrix}
         $$
 
@@ -1184,12 +1201,35 @@
     \end{frame}
 
     \begin{frame}
+        \frametitle{Embeddings and \textless PAD\textgreater}
+        \begin{itemize}
+            \item In NLP we have an idea of embedding
+            \item This is a lookup from word id to a vector representing the word
+            \item The principled approach is force the vector for \textless PAD\textgreater \hspace{1pt} to be all zeros
+            \item Pytorch \texttt{nn.Embedding} has a \texttt{padding\_idx} parameter that will for the vector with
+                    that index to be zero.
+            \item Tensorflow you need to role your own.
+                \href{https://github.com/dpressel/mead-baseline/blob/f98e64afcbab8a267fce5d13a434a981aa564d27/python/baseline/tf/tfy.py\#L656}{This is an example of doing that in Mead-Baseline}
+        \end{itemize}
+        \note{
+            \begin{itemize}
+                \item In general we don't want the network to know anything about the padding
+                \item The padding should just be an artifact of batching that doesn't interact with the network or the
+                    other values at all
+                \item Part of hiding the \textless PAD\textgreater \hspace{1pt} from the network is not letting it learn a
+                    representation of the vector
+                \item We do this by forcing it to zero
+            \end{itemize}
+        }
+    \end{frame}
+
+    \begin{frame}
         \frametitle{The lengths vector}
 
         $$
             \begin{bmatrix}
                 \text{The} & \text{dog} & \text{ran} & \text{very} & \text{fast} \\
-                \text{The} & \text{cat} & \text{slept} & \text{\textless PAD \textgreater} & \text{\textless PAD \textgreater}
+                \text{The} & \text{cat} & \text{slept} & \text{\textless PAD\textgreater} & \text{\textless PAD\textgreater}
             \end{bmatrix}
         $$
         $$
@@ -1198,7 +1238,7 @@
 
         \note{
             \begin{itemize}
-                \item Now that some of our examples are longer because if this \textless PAD \textgreater we need to track how long the
+                \item Now that some of our examples are longer because if this \textless PAD\textgreater we need to track how long the
                     actual data is
                 \item We store this in a lengths vector
                 \item This will be a vector of the same length as the number of items in the batch
@@ -1620,7 +1660,7 @@
             \begin{align*}
                 K &= \begin{bmatrix}
                         \vert & \vert & & \vert & \vert \\
-                        k_1 & k_2 & \cdots & \text{\textless PAD\textgreater} & \text{\textless PAD \textgreater} \\
+                        k_1 & k_2 & \cdots & \text{\textless PAD\textgreater} & \text{\textless PAD\textgreater} \\
                         \vert & \vert & & \vert & \vert \\
                      \end{bmatrix} \\
                 s &= \begin{bmatrix}
@@ -1767,7 +1807,7 @@
                 \includegraphics[width=0.6\textwidth]{images/crf.png}
             \end{center}
             $$
-                P(\hat{y}|x;\theta) = \frac{\exp(\sum_i \sum_j w_j f_j(\hat{y}_{i-1}, \hat{y}_i, x, i))}{\sum_{y' \in Y}\exp(\sum_i
+                P(y|x;\theta) = \frac{\exp(\sum_i \sum_j w_j f_j(y_{i-1}, y_i, x, i))}{\sum_{y' \in Y}\exp(\sum_i
                 \sum_j w_j f_j(y'_{i - 1}, y'_i, x i))}
             $$
             \begin{center}
@@ -1776,7 +1816,19 @@
 
             \note{
                 \begin{itemize}
-                    \item This is our most complex example
+                    \item This is our most complex example so it is ok if you don't understand everything
+                    \item In our token level loss from before we made decision about the label of a token without
+                        considering the label we chose for the last one.
+                    \item Here is this factor graph diagram of a CRF we see that the label decisions are conditioned on
+                        the previous label. This makes the CRF a global model.
+                    \item In the token level loss our scores and therefore the label decision were contextual in that
+                        they were based on the whole input (from an RNN or something) but they don't consider the past
+                        labels so it doesn't have any idea of global coherence.
+                    \item These scores are called the local representation of the token.
+                    \item A trend in research is to buff these local representations while not caring about the global
+                        part to much
+                    \item Problems that deal with making a sequence of decisions like are called structured
+                        prediction problems
                     \item
                         \href{https://www.researchgate.net/figure/Linear-chain-conditional-random-fields-model-Black-nodes-represent-observable-values_fig20_263324470}{Image
                         from Here}
@@ -1786,6 +1838,67 @@
 
         \begin{frame}
             \frametitle{Conditional Random Field}
+
+            \begin{center}
+                \includegraphics[width=0.6\textwidth]{images/crf.png}
+            \end{center}
+            $$
+                P(y|x;\theta) = \frac{\exp(\sum_i \sum_j w_j f_j(y_{i-1}, y_i, x, i))}{\sum_{y' \in Y}\exp(\sum_i
+                \sum_j w_j f_j(y'_{i - 1}, y'_i, x i))}
+            $$
+            \begin{center}
+                \href{https://createmomo.github.io/2017/09/12/CRF_Layer_on_the_Top_of_BiLSTM_1/}{Great Tutorial on CRFs}
+            \end{center}
+
+            \note{
+                \begin{itemize}
+                    \item Our loss function here can help illustrate the differences
+                    \item Thinking back to our token level loss function our loss was the sum of the losses at each step
+                    \item This is explicitly optimizing this local decision making process.
+                    \item In this loss function we see that we are actually acting on the sequence level
+                    \item Our loss is now the score you model gives the gold sequence $y$
+                    \item Normalized but the score of the possible sequences.
+                    \item We want to optimize it so more probability is placed on the gold sentence
+                    \item
+                        \href{https://www.researchgate.net/figure/Linear-chain-conditional-random-fields-model-Black-nodes-represent-observable-values_fig20_263324470}{Image
+                        from Here}
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Conditional Random Field - Best Path}
+            \begin{align*}
+                t &\coloneqq \text{number of tokens} \\
+                c &\coloneqq \text{number of classes} \\
+                e &\in \R^{t \text{ x } c} \\
+                t &\in \R^{c \text{ x } c} \\
+                y &\in \N^t \\
+                \text{gold score} &= \sum_i e_i[y_i] + t[y_{i - 1}, y_i]
+            \end{align*}
+            \note{
+                \begin{itemize}
+                    \item $e$ is our emission scores, this tells us the class scores for each token. This is the local
+                        representation of the token
+                    \begin{itemize}
+                        \item One thing to note is that these scores are unnormalized (not softmaxed). This lets us
+                            avoid some problems locally normalized models have but that is out of scope
+                    \end{itemize}
+                    \item $t$ is our transition scores, this tells us the score of moving from one class to another at
+                        the next step.
+                    \item $e$ is a score tensor that is output by the network whereas $t$ is a parameter that is learned
+                    \item Our score is sum over tokens of emission score for that label plus the score of transitioning
+                        to that label from the previous label.
+                    \item It is easy to see how if you have padding you are going to get junk in your score, The
+                        emission score and the transistors involving padding will get in there
+                    \item This is an easy fix we have seen before, before you sum across the tokens use your mask to set
+                        the padding values to zero and you'll get the right score.
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Conditional Random Field - All Paths}
             \begin{align*}
                 t &\coloneqq \text{number of tokens} \\
                 c &\coloneqq \text{number of classes} \\
@@ -1794,7 +1907,54 @@
                 t &\in \R^{c \text{ x } c} \\
                 \forall_{i \in t} \hspace{2pt} \alpha_i &= \logsumexp(\alpha_{i - 1} + e_i^T + t) \\
             \end{align*}
+            \note{
+                \begin{itemize}
+                    \item When calculating all paths you can't actually enumerate all the possible paths. There are
+                        $t^c$ possible paths.
+                    \item We can use a dynamic programming to do this, it is out of scope though.
+                    \item We have $\alpha$ which represents the total score for any path that ends up in this label
+                    \item We often initialize this $\alpha$ with all the score on a fake \textless START\textgreater
+                        \hspace{1pt} that helps us represent which labels often start a sequence.
+                    \item We calculate a new version of these scores at each time step and overwrite the previous
+                        $\alpha$s
+                    \item We need to make sure that we only update the $\alpha$ if we are transitioning to a valid token
+                    \item If we are looking at a \textless PAD\textgreater \hspace{1pt} we don't want to update the
+                        alpha.
+                \end{itemize}
+            }
+        \end{frame}
 
+        \begin{frame}
+            \frametitle{Conditional Random Field - All Paths}
+            \begin{algorithm}[H]
+                % \SetAlgoLined
+                $T \coloneqq \text{number of tokens in batch}$\;
+                $c \coloneqq \text{number of classes}$\;
+                $t \coloneqq \text{number of valid tokens in example}$\;
+                $\alpha \in \R^S$\;
+                $e \in \R^{t \text{ x } c}$\;
+                $t \in \R^{c \text{ x } c}$\;
+                \For{$i \gets 0$ \KwTo $T$}{
+                    \eIf{$i < t$}{
+                        $\alpha = \logsumexp(\alpha + e_i^T + t)$\;
+                    }{
+                        $\alpha = \alpha$
+                    }
+                }
+            \caption{The Forward Algorithm}
+            \end{algorithm}
+            \note{
+                \begin{itemize}
+                    \item I have removed the \textless START \textgreater \hspace{2pt} and \textless END \textgreater
+                        \hspace{2pt} from this algorithm but you should use them, they are a higher-fidelity
+                        representation and let you model which starts the likely to start of end a sequence
+                    \item This boils down to a simple conditional.
+                    \item If we are still inside the valid tokens we assign alpha based on the results of the dynamic
+                        programming algorithm
+                    \item If we are in the padding step we just reuse the old $\alpha$s
+                    \item How do we implement this conditional with masking?
+                \end{itemize}
+            }
         \end{frame}
 
 \begin{frame}[fragile]
@@ -1804,7 +1964,7 @@
 >>> lengths
 array([3, 1, 5])
 >>> for i in range(np.max(lengths)):
-...     new_alphas = calculate_step(alpha, emission, transistion)
+...     new_alphas = calculate_step(alpha, emission, transition, i)
 ...     mask = (i < lengths).astype(np.uint8)
 ...     print(mask)
 ...     alphas = (alpha * mask) + (new_alphas * (1 - mask))
@@ -1814,6 +1974,15 @@ array([3, 1, 5])
 [0 0 1]
 [0 0 1]
     \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item In this example we can see how we can use create masks that represent conditionals.
+            \item First we track how far we are into the loop with the $i$ variable.
+            \item First we calculate the updated alphas regardless of whether we are padding or not
+            \item Then we make a mask where we have ones if we are inside the valid lengths
+            \item Then we update the alphas based on the mask so that we only update the ones we should.
+        \end{itemize}
+    }
 \end{frame}
 
 \begin{frame}[fragile]
@@ -1829,25 +1998,85 @@ array([3, 1, 5])
         >>> (a * mask) + (b * (1 - mask))
         array([-1, -2, -3,  4,  5])
     \end{pythoncode}
+    \note{
+        \begin{itemize}
+            \item This is a more illustrative example.
+            \item We see positive and negative values.
+            \item We make a mask that represents ``if $a >= 4$ then return $a$ else return $b$''.
+            \item We multiply $a$ by the mask so now all the values are zero when the conditional is false.
+            \item We multiply $b$ by the inverse mask, this makes the elements where $a$ is non zero 0.
+            \item No the non-zero values are disjoint between $a$ and $b$.
+            \item We add the vectors to combine the results.
+        \end{itemize}
+    }
 \end{frame}
 
         \begin{frame}
-            \frametitle{CRF}
+            \frametitle{Conditional Random Field}
+            \begin{center}
+                A complex layer with complex padding \\
+                \vspace{10pt}
+                \includegraphics[width=0.6\textwidth]{images/crf.png}
+            \end{center}
+            \note{
+                \begin{itemize}
+                    \item The CRF is a rather complex layer but the main reason I brought it up here is that it introduces a new way
+                        that we need to handle padding.
+                    \item We are using the mask to simulate a conditional.
+                    \item This is common in parallel processing where we compute both branches of a conditional and use
+                        a mask to combine the result according to that conditional.
+                \end{itemize}
+            }
+        \end{frame}
 
-            This needs a lot more
+        \begin{frame}
+            \frametitle{Viterbi}
 
-            CRF are used in sequence tagging to model dependencies in the output
+            \begin{itemize}
+                \item When we predict actual tags from a CRF we use the Viterbi algorithm to find the maximum scoring
+                    path.
+                \item The algorithm is the exact same as the forward algorithm except that use us a $\max$ instead of a
+                    $\logsumexp$ when computing the new $\alphas$
+                \item $\alpha$ now represents the maximum score of any path that ends at each class
+                \item We can using the exact same padding trick when doing Viterbi decoding!
+            \end{itemize}
+            \note{
+                \begin{itemize}
+                    \item A way to look at these two algorithms is that they are the same algorithm using different
+                        semirings. We basically define different operations for sums and additions
+                        \begin{itemize}
+                            \item The CRF forward is on the log semiring where the addition is a log sum exp addition
+                            \item The Viterbi algorithm is on the Viterbi semiring where the addition is a maximum
+                        \end{itemize}
+                    \item in the CRF $\alpha$ was the sum of scores for all paths that end in some class
+                    \item in Viterbi $\alpha$ is the maximum score of any path that ends in some class
+                \end{itemize}
+            }
+        \end{frame}
 
-            At each step we calculate the possible scores or transitioning to any state from any state
+        \begin{frame}
+            \frametitle{Viterbi - Getting a Path}
 
-            Once we hit the end we don't want to overwrite our scores with transistors into the padding
+            \begin{center}
+                \includegraphics[width=0.7\textwidth]{images/backtrack.png}
+            \end{center}
 
-            The CRF gives us a new way to handle batches, we essentially have an if, only update alpha if we are still
-            inside the valid lengths. We do an if by calculating the results of both branches (do nothing to the alpha
-            and calculate the next step) and use a mask to combine them.
-
-            The Viterbi decoding works the same way
-
+            \note{
+                \begin{itemize}
+                    \item Like most dynamic programming algorithms you need to store your decisions so you can back
+                        track through to get your actual answer
+                    \item In this picture we can see these arrows that tell us where we came from and can be used to
+                        recover the edit path.
+                    \item When doing Viterbi decoding we calculate these backtracks with the argmax
+                    \item As we calculate the back tracking we need to not overwrite the final decision once we hit the
+                        end of the valid lengths
+                    \item We use the same kind of padding we used above for this.
+                    \item When we are following the backtrack we need to do something similar but flip the lengths we
+                        care about because we are reading from the back of the tensor.
+                    \item \href{https://en.wikipedia.org/wiki/Needleman\%E2\%80\%93Wunsch_algorithm}{Image from here}
+                    \item Now that we have talked about some complex cases lets look at some subtle ones.
+                \end{itemize}
+            }
         \end{frame}
 
     \end{subsection} % CRF
@@ -2337,16 +2566,43 @@ array([3, 1, 5])
 
             \note{
                 \begin{itemize}
-                    \item Does this matter? Yes, when I first noticed this but I trained a tagger on `Conll 2003` and
-                        the first thing I trained have slightly different results based on if it was run on a single
-                        example of batches so it seems very prevalent.
-                    \item Elmo has this batch instability bug but given their cavalier attitude to the RNN hidden states
-                        I think the engineering in Elmo is pretty from the hip so they probably don't care
-                    \item For the last use case I don't think we really need to care, padding in a later stage (CRF or
-                        the token level loss) should save us.
-                    \item "But how do I fix this one Brian?" This is one is pretty easy you just need to zero out the
-                        padded values after they go through the conv. If you are following it with maxpool you might
-                        want to just jumpr right to masking the pad values with a very negative number
+                    \item Does this matter? This seems rare enough that you shouldn't care
+                    \item Yes it does
+                    \begin{itemize}
+                        \item I first noticed this error in a tagger where the output tags were different between
+                            running in batched mode and running in single mode.
+                        \item The very first tagger I trained to try to recreate this had the exact same error so it is
+                            rather prevalent
+                        \item These taggers only use these convs in the character compositional word representations.
+                            The fact that this errors can propagate all the way to a label flip is worrying for the
+                            robustness of Neural Networks
+                    \end{itemize}
+                \end{itemize}
+            }
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Batched Convolution 1D}
+            These Convolutions are commonly used for:
+            \begin{itemize}
+                \item Encoding word n-grams which are then max pooled to create sentence representations for text
+                    classification
+                \item Encoding character n-grams and max pooling to create word representations. These ``char
+                    compositional'' features are common for sequence tagging
+                \item Creating a windowed context for tagging
+            \end{itemize}
+
+            \note{
+                \begin{itemize}
+                    \item Elmo has this batch instability bug too, but given their cavalier attitude to the RNN hidden states
+                        I think the engineering in Elmo is pretty from the hip so they probably don't care. This is a
+                        rant for anther time so I will move on.
+                    \item An Interesting observation is that for the last use case I don't think we really need to care,
+                        padding in a later stage (CRF or the token level loss) should save us.
+                    \item "But how do I fix this one Brian?"
+                    \item This is one is pretty easy you just need to zero out the padded values after they go through
+                        the conv. If you are following it with maxpool you might want to just jump right to masking the
+                        pad values with a very negative number
                 \end{itemize}
             }
         \end{frame}
@@ -2372,7 +2628,7 @@ def test_batch_stability():
     np.texting.assert_allclose(batch2, ex2)
     \end{pythoncode}
 
-    \href{https://github.com/dpressel/mead-baseline/blob/f98e64afcbab8a267fce5d13a434a981aa564d27/python/tests/test_crf_pytorch.py#L265}{An
+    \href{https://github.com/dpressel/mead-baseline/blob/f98e64afcbab8a267fce5d13a434a981aa564d27/python/tests/test_crf_pytorch.p\#L265}{An
     example of these tests in our CRF}
 
     \note{
@@ -2418,7 +2674,7 @@ def test_batch_stability():
     \begin{itemize}
         \item
             \href{https://github.com/blester125/A2D-NLP-Talk-Feb-27-2020/blob/master/Your-Neural-Network-Is-Probably-Wrong.pdf}{Slides}
-        \item \href{https://twitter.com/blester125}{Twitter}
+        \item \href{https://twitter.com/blester125}{Twitter: @blester125}
         \item \href{https://github.com/blester125}{Github}
         \item \href{https://github.com/dpressel/mead-baseline}{Mead-Baseline}
     \end{itemize}
