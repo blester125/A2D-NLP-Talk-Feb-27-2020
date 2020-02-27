@@ -1214,22 +1214,25 @@
     \begin{frame}
         \frametitle{Embeddings and \textless PAD\textgreater}
         \begin{itemize}
-            \item In NLP we have an idea of embedding
-            \item This is a lookup from word id to a vector representing the word
-            \item The principled approach is force the vector for \textless PAD\textgreater \hspace{1pt} to be all zeros
+            \item In NLP we have this idea of an ``embedding''.
+            \item This is a mapping from a word id to a vector that represents the word.
+            \item The principled approach is force the vector for \textless PAD\textgreater \hspace{1pt} to be all
+                zeros.
             \item Pytorch \texttt{nn.Embedding} has a \texttt{padding\_idx} parameter that will force the vector with
                     that index to be zero.
             \item In Tensorflow you need to role your own.
-                \href{https://github.com/dpressel/mead-baseline/blob/f98e64afcbab8a267fce5d13a434a981aa564d27/python/baseline/tf/tfy.py\#L656}{This is an example of doing that in Mead-Baseline}
+                \href{https://github.com/dpressel/mead-baseline/blob/f98e64afcbab8a267fce5d13a434a981aa564d27/python/baseline/tf/tfy.py\#L656}{This
+                is an example of doing that in Mead-Baseline.}
         \end{itemize}
         \note{
             \begin{itemize}
-                \item In general we don't want the network to know anything about the padding
+                \item Why is this the principled way?
+                \item In general we don't want the network to know anything about the padding.
                 \item The padding should just be an artifact of batching that doesn't interact with the network or the
-                    other values at all
+                    other values at all.
                 \item Part of hiding the \textless PAD\textgreater \hspace{1pt} from the network is not letting it learn a
-                    representation of the vector
-                \item We do this by forcing it to zero
+                    representation of the vector.
+                \item We do this by forcing it to zero.
             \end{itemize}
         }
     \end{frame}
