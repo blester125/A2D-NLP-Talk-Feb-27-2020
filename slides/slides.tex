@@ -8,6 +8,7 @@
 \usepackage{mathtools}
 \usepackage{minted}
 \usepackage{hyperref}
+\usepackage{hhline}
 \usepackage[ruled]{algorithm2e}
 \hypersetup{
     colorlinks=true,
@@ -2187,7 +2188,23 @@ array([3, 1, 5])
 
         \begin{frame}
             \frametitle{Max Pooling Results}
-
+                \centering
+                \begin{tabular}{l | r r r r}
+                    Model & mean & std & min & max \\
+                    \hhline{=|====}
+                    Masking & 83.60 & 0.22 & 83.31 & 83.86 \\
+                    Na\"{i}ve & 82.90 & 0.43 & 82.15 & 83.20
+                \end{tabular}
+                \note{
+                    \begin{itemize}
+                        \item Here we can see a small selection of results comparing these differences.
+                        \item There were 5 runs of a simple Max Over Time Neural Bag of Words on the SST2 dataset
+                        \item As we can see the mean result of the version where we masked correctly is higher than not
+                            doing it.
+                        \item We also see that the variability is lower. I would imagine that this is because we no
+                            longer have randomness in the results depending on what things are batched together.
+                    \end{itemize}
+                }
         \end{frame}
 
     \end{subsection} % Max Pooling
