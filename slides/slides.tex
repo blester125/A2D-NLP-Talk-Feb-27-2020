@@ -1919,7 +1919,7 @@
             \begin{align*}
                 t &\coloneqq \text{number of tokens} \\
                 c &\coloneqq \text{number of classes} \\
-                \alpha &\in \R^S \\
+                \alpha &\in \R^c \\
                 e &\in \R^{t \text{ x } c} \\
                 t &\in \R^{c \text{ x } c} \\
                 \forall_{i \in t} \hspace{2pt} \alpha_i &= \logsumexp(\alpha_{i - 1} + e_i^T + t) \\
@@ -1948,7 +1948,7 @@
                 $T \coloneqq \text{number of tokens in batch}$\;
                 $c \coloneqq \text{number of classes}$\;
                 $t \coloneqq \text{number of valid tokens in example}$\;
-                $\alpha \in \R^S$\;
+                $\alpha \in \R^c$\;
                 $e \in \R^{t \text{ x } c}$\;
                 $t \in \R^{c \text{ x } c}$\;
                 \For{$i \gets 0$ \KwTo $T$}{
@@ -2398,7 +2398,7 @@ array([3, 1, 5])
                     \item Here we can see how conv-padding can be used to stop the sequence from getting shorter
                     \item Here we can see we are adding a padding of zeros on each side
                     \item There are filtersz // 2 units on each side
-                    \item Another advantage of this conv-padding is that without padding there is on;y a single
+                    \item Another advantage of this conv-padding is that without padding there is only a single
                         calculation that involves the first word. conv-padding makes it so that there is more
                         information from the tokens on each end.
                     \item We see here how we now get a vector that is the same length as the input (before padding)
@@ -2431,7 +2431,7 @@ array([3, 1, 5])
                     \item Here we can see how conv-padding can be used to stop the sequence from getting shorter
                     \item Here we can see we are adding a padding of zeros on each side
                     \item There are filtersz // 2 units on each side
-                    \item Another advantage of this conv-padding is that without padding there is on;y a single
+                    \item Another advantage of this conv-padding is that without padding there is only a single
                         calculation that involves the first word. conv-padding makes it so that there is more
                         information from the tokens on each end.
                     \item We see here how we now get a vector that is the same length as the input (before padding)
@@ -2464,7 +2464,7 @@ array([3, 1, 5])
                     \item Here we can see how conv-padding can be used to stop the sequence from getting shorter
                     \item Here we can see we are adding a padding of zeros on each side
                     \item There are filtersz // 2 units on each side
-                    \item Another advantage of this conv-padding is that without padding there is on;y a single
+                    \item Another advantage of this conv-padding is that without padding there is only a single
                         calculation that involves the first word. conv-padding makes it so that there is more
                         information from the tokens on each end.
                     \item We see here how we now get a vector that is the same length as the input (before padding)
@@ -2497,7 +2497,7 @@ array([3, 1, 5])
                     \item Here we can see how conv-padding can be used to stop the sequence from getting shorter
                     \item Here we can see we are adding a padding of zeros on each side
                     \item There are filtersz // 2 units on each side
-                    \item Another advantage of this conv-padding is that without padding there is on;y a single
+                    \item Another advantage of this conv-padding is that without padding there is only a single
                         calculation that involves the first word. conv-padding makes it so that there is more
                         information from the tokens on each end.
                     \item We see here how we now get a vector that is the same length as the input (before padding)
