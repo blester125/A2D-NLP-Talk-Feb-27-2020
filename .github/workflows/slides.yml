@@ -7,7 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     container: blester125/beamer-image:latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
+      with:
+          ref: master
     - name: Build Slides
       run: |
         make clean
