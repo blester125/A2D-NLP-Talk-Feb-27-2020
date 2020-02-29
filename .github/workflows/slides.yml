@@ -29,6 +29,9 @@ jobs:
       with:
           name: slides
           path: Your-Neural-Network-Is-Probably-Wrong.pdf
+    - uses: list files
+      run: |
+          ls
     - name: Commit Files
       shell: bash
       run: |
