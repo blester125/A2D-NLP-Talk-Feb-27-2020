@@ -15,7 +15,7 @@ jobs:
     - uses: actions/upload-artifact@v1
       if: success()
       with:
-          name: slides
+          name: artifacts
           path: Your-Neural-Network-Is-Probably-Wrong.pdf
   commit:
     needs: build
@@ -27,7 +27,7 @@ jobs:
           rm -rf Your-Neural-Network-Is-Probably-Wrong.pdf
     - uses: actions/download-artifact@v1
       with:
-          name: slides
+          name: artifacts
           path: tmp
     - name: Move artifacts
       run: |
