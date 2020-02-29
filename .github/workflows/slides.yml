@@ -8,12 +8,13 @@ jobs:
     container: blester125/beamer-image:latest
     steps:
     - uses: actions/checkout@master
-      with:
-          ref: master
     - name: Build Slides
       run: |
         make clean
         make
+  commit:
+    needs: build
+    runs-on: ubuntu-latest
     - name: Commit
       uses: github-actions-x/commit@v2.3
       with:
