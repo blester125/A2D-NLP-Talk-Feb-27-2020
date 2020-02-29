@@ -28,9 +28,11 @@ jobs:
     - uses: actions/download-artifact@v1
       with:
           name: slides
-    - name: move slides back
+          path: tmp
+    - name: Move artifacts
       run: |
-          mv slides/Your-Neural-Network-Is-Probably-Wrong.pdf Your-Neural-Network-Is-Probably-Wrong.pdf
+          mv tmp/* .
+          rm -rf tmp
     - name: Commit Files
       shell: bash
       run: |
@@ -38,7 +40,7 @@ jobs:
           git diff-index --quiet HEAD \
           || git -c user.name="GitHub" -c user.email="noreply@github.com" commit \
             --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>" \
-            -m "Add changes"
+            -m "Built Slides"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
