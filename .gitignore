@@ -9,3 +9,4 @@
 *.log
 *.out
 *.vrb*
+!Your-Neural-Network-Is-Probably-Wrong.pdf
