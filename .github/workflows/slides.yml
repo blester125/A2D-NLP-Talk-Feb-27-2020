@@ -15,6 +15,7 @@ jobs:
   commit:
     needs: build
     runs-on: ubuntu-latest
+    steps:
     - name: Commit
       uses: github-actions-x/commit@v2.3
       with:
