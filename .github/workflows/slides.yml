@@ -12,18 +12,29 @@ jobs:
       run: |
         make clean
         make
+    - uses: actions/upload-artifact@v1
+      if: success()
+      with:
+          name: slides
+          path: Your-Neural-Network-Is-Probably-Wrong.pdf
   commit:
     needs: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Commit
-      uses: github-actions-x/commit@v2.3
+    - uses: actions/download-artifact@v1
       with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          push-branch: 'master'
-          commit-message: 'Built Slides'
-          force-add: 'true'
-          files: Your-Neural-Network-Is-Probably-Wrong.pdf
-          name: "Brian Lester"
-          email: "blester125@users.noreply.github.com"
+          name: slides
+          path: Your-Neural-Network-Is-Probably-Wrong.pdf
+    - name: Commit Files
+      shell: bash
+      run: |
+          git add -A
+          git diff-index --quiet HEAD \
+          || git -c user.name="GitHub" -c user.email="noreply@github.com" commit \
+            --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>" \
+            -m "Add changes"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
