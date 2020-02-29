@@ -5,6 +5,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: adnrv/texlive
     steps:
     - uses: actions/checkout@v2
     - name: Build Slides
