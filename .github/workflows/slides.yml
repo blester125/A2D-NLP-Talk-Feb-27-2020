@@ -10,6 +10,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build Slides
       run: |
+        pip install pygmentize
         make
     - name: Commit Files
       shell: bash
