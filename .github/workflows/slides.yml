@@ -28,6 +28,9 @@ jobs:
     - uses: actions/download-artifact@v1
       with:
           name: slides
+    - name: move slides back
+      run: |
+          mv slides/Your-Neural-Network-Is-Probably-Wrong.pdf Your-Neural-Network-Is-Probably-Wrong.pdf
     - name: Commit Files
       shell: bash
       run: |
