@@ -35,6 +35,8 @@ jobs:
     - name: Commit Files
       shell: bash
       run: |
+          git status
+          git add Your-Neural-Network-Is-Probably-Wrong.pdf
           git add -A
           git diff-index --quiet HEAD \
           || git -c user.name="GitHub" -c user.email="noreply@github.com" commit \
