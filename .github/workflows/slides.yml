@@ -1,0 +1,23 @@
+name: Slides
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Slides
+      run: |
+        make
+    - name: Commit Files
+      shell: bash
+      run: |
+        git add -A
+        git diff-index --quiet HEAD || git -c user.name="GitHub" -c user.email="noreply@github.com" commit \
+          --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>" \
+           -m "Built Slides"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
