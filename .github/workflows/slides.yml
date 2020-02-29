@@ -5,12 +5,12 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: adnrv/texlive
+    container: blester125/beamer-image:latest
     steps:
     - uses: actions/checkout@v2
     - name: Build Slides
       run: |
-        pip install pygmentize
+        make clean
         make
     - name: Commit Files
       shell: bash
